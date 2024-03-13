@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb122b5298b769b4786c7e81a5296b12, type: 3}
+  m_Name: Player Stats
+  m_EditorClassIdentifier: 
+  _health: 100
+  _actionPointsPerTurn: 3
+  _characterActions:
+  - _actionCost: 1
+    _characterActionType: 0
+  - _actionCost: 2
+    _characterActionType: 1
+  _movementStats:
+    MoveSpeed: 3
+    MoveDistance: 3
+  _attackStats:
+    AttackRange: 3
+    MoveDistance: 3
+    AttackDamage: 3
