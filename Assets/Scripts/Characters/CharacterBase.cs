@@ -25,20 +25,20 @@ namespace Characters.CharacterControls
         public CharacterMovementEvents MovementEvents { get; private set; }
         public CharacterAttackEvents AttackEvents { get; private set; }
 
-        protected Health p_health;
-        protected CharacterMovementController p_movementController;
-        protected CharacterAttackController p_attackController;
+        private Health _health;
+        private CharacterMovementController _movementController;
+        private CharacterAttackController _attackController;
 
-        public OverlayTile p_standingTile;
-        public CombatActionType p_selectedAction;
+        private OverlayTile _standingTile;
+        private CombatActionType _selectedAction;
 
-        public int p_availableActionsCount;
+        private int _availableActionsCount;
 
         protected virtual void Awake()
         {
-            p_health = GetComponent<Health>();
-            p_movementController = GetComponent<CharacterMovementController>();
-            p_attackController = GetComponent<CharacterAttackController>();
+            _health = GetComponent<Health>();
+            _movementController = GetComponent<CharacterMovementController>();
+            _attackController = GetComponent<CharacterAttackController>();
 
             HealthEvents = new CharacterHealthEvents();
             AttackEvents = new CharacterAttackEvents();
@@ -47,46 +47,46 @@ namespace Characters.CharacterControls
 
         protected virtual void Start()
         {
-            p_availableActionsCount = p_stats.ActionsPerTurnCount;
-            p_health.Initialize(this, p_stats.Health, HealthEvents);
-            p_movementController.Initialize(this, MovementEvents);
-            p_attackController.Initialize(this, AttackEvents);
+            _availableActionsCount = p_stats.ActionsPerTurnCount;
+            _health.Initialize(this, p_stats.Health, HealthEvents);
+            _movementController.Initialize(this, MovementEvents);
+            _attackController.Initialize(this, AttackEvents);
         }
 
         #region Getters Actions Stuff
 
         public void SelectAction(CombatActionType selectedAction)
         {
-            p_selectedAction = selectedAction;
+            _selectedAction = selectedAction;
 
-            switch (p_selectedAction)
+            switch (_selectedAction)
             {
                 case CombatActionType.None:
                     RangeFinder.HideTiles();
                     break;
 
                 case CombatActionType.Move:
-                    RangeFinder.ShowTilesInRange(p_standingTile, p_stats.MovementStats.MoveDistance);
+                    RangeFinder.ShowTilesInRange(_standingTile, p_stats.MovementStats.MoveDistance);
                     break;
 
                 case CombatActionType.Attack:
                     RangeFinder.HideTiles();
-                    RangeFinder.MarkEnemiesInRangeTiles(p_standingTile, p_stats.AttackStats.AttackRange);
+                    RangeFinder.MarkEnemiesInRangeTiles(_standingTile, p_stats.AttackStats.AttackRange);
                     break;
             }
         }
 
         public void TakeAction(OverlayTile actionTile)
         {
-            switch (p_selectedAction)
+            switch (_selectedAction)
             {
                 case CombatActionType.Move:
-                    p_movementController.Move(actionTile);
+                    _movementController.Move(actionTile);
                     UseActionPoint();
                     break;
 
                 case CombatActionType.Attack:
-                    p_attackController.Attack(actionTile);
+                    _attackController.Attack(actionTile);
                     UseActionPoint();
                     break;
 
@@ -98,23 +98,23 @@ namespace Characters.CharacterControls
 
         public int GetAvailableActionPoints()
         {
-            return p_availableActionsCount;
+            return _availableActionsCount;
         }
 
         protected void UseActionPoint()
         {
-            p_availableActionsCount--;
+            _availableActionsCount--;
         }
 
         protected void ResetSelectedAction()
         {
-            p_selectedAction = CombatActionType.None;
-            p_availableActionsCount = p_stats.ActionsPerTurnCount;
+            _selectedAction = CombatActionType.None;
+            _availableActionsCount = p_stats.ActionsPerTurnCount;
         }
 
         public int GetRemainingActionsCount()
         {
-            return p_availableActionsCount;
+            return _availableActionsCount;
         }
 
         public int GetActionsPerTurnCount()
@@ -128,17 +128,17 @@ namespace Characters.CharacterControls
 
         public int GetHealth()
         {
-            return p_health.GetCurrentHealth();
+            return _health.GetCurrentHealth();
         }
 
         public int GetMaxHealth()
         {
-            return p_health.GetMaxHealth();
+            return _health.GetMaxHealth();
         }
 
         public void TakeDamage(int ammount)
         {
-            p_health.TakeDamage(ammount);
+            _health.TakeDamage(ammount);
         }
 
         #endregion
@@ -172,12 +172,12 @@ namespace Characters.CharacterControls
 
         public void SetStandingTile(OverlayTile standingTile)
         {
-            p_standingTile = standingTile;
+            _standingTile = standingTile;
         }
 
         public OverlayTile GetStandingTile()
         {
-            return p_standingTile;
+            return _standingTile;
         }
 
         public Vector2Int GetPosition2D()
