@@ -5,6 +5,7 @@ using Characters.CharacterControls.Movement;
 using Characters.CharacterControls.MovementEvents;
 using Characters.HealthControls;
 using Constants;
+using Helpers.RangeFinding;
 using Tiles;
 using UnityEngine;
 
@@ -28,10 +29,10 @@ namespace Characters.CharacterControls
         protected CharacterMovementController p_movementController;
         protected CharacterAttackController p_attackController;
 
-        protected OverlayTile p_standingTile;
-        protected CombatActionType p_selectedAction;
+        public OverlayTile p_standingTile;
+        public CombatActionType p_selectedAction;
 
-        protected int _availableActionsCount;
+        public int p_availableActionsCount;
 
         protected virtual void Awake()
         {
@@ -46,7 +47,7 @@ namespace Characters.CharacterControls
 
         protected virtual void Start()
         {
-            _availableActionsCount = p_stats.ActionsPerTurnCount;
+            p_availableActionsCount = p_stats.ActionsPerTurnCount;
             p_health.Initialize(this, p_stats.Health, HealthEvents);
             p_movementController.Initialize(this, MovementEvents);
             p_attackController.Initialize(this, AttackEvents);
@@ -54,25 +55,66 @@ namespace Characters.CharacterControls
 
         #region Getters Actions Stuff
 
+        public void SelectAction(CombatActionType selectedAction)
+        {
+            p_selectedAction = selectedAction;
+
+            switch (p_selectedAction)
+            {
+                case CombatActionType.None:
+                    RangeFinder.HideTiles();
+                    break;
+
+                case CombatActionType.Move:
+                    RangeFinder.ShowTilesInRange(p_standingTile, p_stats.MovementStats.MoveDistance);
+                    break;
+
+                case CombatActionType.Attack:
+                    RangeFinder.HideTiles();
+                    RangeFinder.MarkEnemiesInRangeTiles(p_standingTile, p_stats.AttackStats.AttackRange);
+                    break;
+            }
+        }
+
+        public void TakeAction(OverlayTile actionTile)
+        {
+            switch (p_selectedAction)
+            {
+                case CombatActionType.Move:
+                    p_movementController.Move(actionTile);
+                    UseActionPoint();
+                    break;
+
+                case CombatActionType.Attack:
+                    p_attackController.Attack(actionTile);
+                    UseActionPoint();
+                    break;
+
+                case CombatActionType.None:
+                    ResetSelectedAction();
+                    break;
+            }
+        }
+
         public int GetAvailableActionPoints()
         {
-            return _availableActionsCount;
+            return p_availableActionsCount;
         }
 
         protected void UseActionPoint()
         {
-            _availableActionsCount--;
+            p_availableActionsCount--;
         }
 
         protected void ResetSelectedAction()
         {
             p_selectedAction = CombatActionType.None;
-            _availableActionsCount = p_stats.ActionsPerTurnCount;
+            p_availableActionsCount = p_stats.ActionsPerTurnCount;
         }
 
         public int GetRemainingActionsCount()
         {
-            return _availableActionsCount;
+            return p_availableActionsCount;
         }
 
         public int GetActionsPerTurnCount()
@@ -144,7 +186,6 @@ namespace Characters.CharacterControls
             Vector2Int positionInt = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
             return positionInt;
         }
-
         #endregion
 
     }

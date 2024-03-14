@@ -12,10 +12,8 @@ public class TurnManager : MonoBehaviour
     private IPlayer _player;
     private List<IEnemy> _enemies;
     private int _currentEnemyIndex;
-    private TurnState _turnState;
 
     public event Action<ICharacter> OnCharacterTurn;
-
 
     public void Initialize(IPlayer player)
     {
@@ -47,16 +45,23 @@ public class TurnManager : MonoBehaviour
 
     private void UpdateTurnState(TurnState turnState)
     {
-        _turnState = turnState;
-
         switch (turnState)
         {
             case TurnState.PlayerTurn:
-                PlayerTurn();
+                OnCharacterTurn?.Invoke(_player);
                 break;
 
             case TurnState.EnemyTurn:
-                EnemyTurn();
+
+                if (_enemies.Count > 0 && _enemies[_currentEnemyIndex].CreateActionScenario(_player))
+                {
+                    OnCharacterTurn?.Invoke(_enemies[_currentEnemyIndex]);
+                }
+                else
+                {
+                    goto case TurnState.PlayerTurn;
+                }
+
                 break;
 
             case TurnState.EnvironmentTurn:
@@ -93,11 +98,7 @@ public class TurnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(1.3f);
 
-        if (enemy.GetRemainingActionsCount() > 0)
-        {
-            enemy.TakeAction(_player);
-        }
-        else
+        if (!enemy.CreateActionScenario(_player))
         {
             _currentEnemyIndex++;
             if (_currentEnemyIndex >= _enemies.Count)
@@ -107,27 +108,8 @@ public class TurnManager : MonoBehaviour
             }
             else
             {
-                _enemies[_currentEnemyIndex].TakeAction(_player);
+                UpdateTurnState(TurnState.EnemyTurn);
             }
-        }
-    }
-
-    private void PlayerTurn()
-    {
-        OnCharacterTurn?.Invoke(_player);
-    }
-
-    private void EnemyTurn()
-    {
-        if(_enemies.Count > 0)
-        {
-            // Start the turn for the first enemy
-            _enemies[_currentEnemyIndex].TakeAction(_player);
-            OnCharacterTurn?.Invoke(_enemies[_currentEnemyIndex]);
-        }
-        else
-        {
-            UpdateTurnState(TurnState.PlayerTurn);
         }
     }
 }

@@ -1,5 +1,5 @@
 public interface IEnemy : ICharacter
 {
-    void TakeAction(IPlayer player);
+    bool CreateActionScenario(IPlayer player);
     int GetExp();
 }

@@ -12,6 +12,12 @@ namespace Characters.CharacterControls.Attack
         private CharacterAttackEvents _attackEvents;
 
         private OverlayTile _targetTile;
+        private bool _isAttacking;
+
+        private void Awake()
+        {
+            _isAttacking = false;
+        }
 
         public void Initialize(ICharacter character, CharacterAttackEvents attackEvents)
         {
@@ -21,11 +27,12 @@ namespace Characters.CharacterControls.Attack
 
         public void Attack(OverlayTile selectedTile)
         {
-            if (selectedTile.IsAvailable && selectedTile.GetPosition2D() != _character.GetStandingTile().GetPosition2D())
+            if (selectedTile.IsAvailable && selectedTile.GetPosition2D() != _character.GetStandingTile().GetPosition2D() && _isAttacking)
             {
                 return;
             }
 
+            _isAttacking = true;
             _targetTile = selectedTile;
             StartAttackRoutine();
         }
@@ -42,11 +49,15 @@ namespace Characters.CharacterControls.Attack
 
             yield return new WaitForSeconds(0.5f);
 
+            _isAttacking = false;
+
             var target = _targetTile.GetStandingCharacter();
 
-            target.TakeDamage(_character.GetAttackDamage());
-
-            _attackEvents.CallAttackEvent(_targetTile, _character, target);
+            if (target != null)
+            {
+                target.TakeDamage(_character.GetAttackDamage());
+                _attackEvents.CallAttackEvent(_targetTile, _character, target);
+            }
         }
     }
 }

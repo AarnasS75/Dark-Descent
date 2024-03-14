@@ -27,7 +27,7 @@ public class RoomController : MonoBehaviour
     {
         foreach (var enemy in FindObjectsOfType<Enemy>())
         {
-            Destroy(enemy);
+            Destroy(enemy.gameObject);
         }
     }
 

@@ -1,3 +1,4 @@
+using Constants;
 using Helpers.PathFinding;
 using Helpers.RangeFinding;
 using System.Collections.Generic;
@@ -19,8 +20,15 @@ namespace Characters.EnemyControls
             _enemy = enemy;
         }
 
-        public ActionScenario GetScenario(IPlayer player)
+        public bool ActionScenarioOutcome(IPlayer player)
         {
+            if(_enemy.GetRemainingActionsCount() <= 0)
+            {
+                _enemy.SelectAction(CombatActionType.None);
+                _enemy.TakeAction(null);
+                return false;
+            }
+
             _player = player;
             _standingOnTile = _enemy.GetStandingTile();
 
@@ -65,7 +73,20 @@ namespace Characters.EnemyControls
                 }
             }
 
-            return senario;
+            // If doesn't need to get closer and tile to attack is in range
+            if (senario.MoveToTile.GetPosition2D() == _enemy.GetStandingTile().GetPosition2D() && senario.AttackTile != null)
+            {
+                _enemy.SelectAction(CombatActionType.Attack);
+                _enemy.TakeAction(senario.AttackTile);
+            }
+            // If needs to get closer and after moving, tile to attack would still not be in range
+            else
+            {
+                _enemy.SelectAction(CombatActionType.Move);
+                _enemy.TakeAction(senario.MoveToTile);
+            }
+
+            return true;
         }
         
         private ActionScenario CreateTileSenarioValue(OverlayTile tempTile)

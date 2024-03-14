@@ -26,11 +26,13 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         _turnManager.OnCharacterTurn += _turnSystem_OnCharacterTurn;
+        _player.HealthEvents.OnDied += PlayerHealthEvents_OnDied;
     }
 
     private void OnDisable()
     {
         _turnManager.OnCharacterTurn -= _turnSystem_OnCharacterTurn;
+        _player.HealthEvents.OnDied -= PlayerHealthEvents_OnDied;
     }
 
     private void _turnSystem_OnCharacterTurn(ICharacter character)
@@ -75,7 +77,6 @@ public class GameManager : MonoBehaviour
         {
             _player = Instantiate(_playerPrefab).GetComponent<Player>();
         }
-        _player.HealthEvents.OnDied += PlayerHealthEvents_OnDied;
     }
 
     private void PlayerHealthEvents_OnDied(CharacterHealthEvents arg1, CharacterDiedEventArgs arg2)
