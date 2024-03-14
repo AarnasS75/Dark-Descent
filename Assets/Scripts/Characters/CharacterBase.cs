@@ -1,4 +1,3 @@
-using Characters.Actions;
 using Characters.CharacterControls.Attack;
 using Characters.CharacterControls.AttackEvents;
 using Characters.CharacterControls.HealthEvents;
@@ -6,11 +5,7 @@ using Characters.CharacterControls.Movement;
 using Characters.CharacterControls.MovementEvents;
 using Characters.HealthControls;
 using Constants;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Tiles;
-using TMPro;
 using UnityEngine;
 
 namespace Characters.CharacterControls
@@ -24,7 +19,6 @@ namespace Characters.CharacterControls
     public class CharacterBase : MonoBehaviour, ICharacter
     {
         [SerializeField] protected CharacterStatsBase p_stats;
-        public CharacterStatsBase Stats => p_stats;
 
         public CharacterHealthEvents HealthEvents { get; private set; }
         public CharacterMovementEvents MovementEvents { get; private set; }
@@ -54,21 +48,23 @@ namespace Characters.CharacterControls
         {
             _availableActionsCount = p_stats.ActionsPerTurnCount;
             p_health.Initialize(this, p_stats.Health, HealthEvents);
-            p_movementController.Initialize(this, p_stats.MovementStats, MovementEvents);
-            p_attackController.Initialize(this, p_stats.AttackStats, AttackEvents);
+            p_movementController.Initialize(this, MovementEvents);
+            p_attackController.Initialize(this, AttackEvents);
         }
+
+        #region Getters Actions Stuff
 
         public int GetAvailableActionPoints()
         {
             return _availableActionsCount;
         }
 
-        public void UseActionPoint()
+        protected void UseActionPoint()
         {
             _availableActionsCount--;
         }
 
-        public void ResetSelectedAction()
+        protected void ResetSelectedAction()
         {
             p_selectedAction = CombatActionType.None;
             _availableActionsCount = p_stats.ActionsPerTurnCount;
@@ -84,15 +80,53 @@ namespace Characters.CharacterControls
             return p_stats.ActionsPerTurnCount;
         }
 
+        #endregion
+
+        #region Getters Health Stuff
+
         public int GetHealth()
         {
             return p_health.GetCurrentHealth();
+        }
+
+        public int GetMaxHealth()
+        {
+            return p_health.GetMaxHealth();
         }
 
         public void TakeDamage(int ammount)
         {
             p_health.TakeDamage(ammount);
         }
+
+        #endregion
+
+        #region Getters Attack Stuff
+        public int GetAttackDamage()
+        {
+            return p_stats.AttackStats.AttackDamage;
+        }
+
+        public int GetAttackRange()
+        {
+            return p_stats.AttackStats.AttackRange;
+        }
+
+        #endregion
+
+        #region Getters Movement Stuff
+        public float GetMoveSpeed()
+        {
+            return p_stats.MovementStats.MoveSpeed;
+        }
+
+        public int GetMoveRange()
+        {
+            return p_stats.MovementStats.MoveDistance;
+        }
+        #endregion
+
+        #region Getters Character Position Stuff
 
         public void SetStandingTile(OverlayTile standingTile)
         {
@@ -110,5 +144,8 @@ namespace Characters.CharacterControls
             Vector2Int positionInt = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
             return positionInt;
         }
+
+        #endregion
+
     }
 }

@@ -1,8 +1,10 @@
+using Characters.CharacterControls.MovementEvents;
 using Characters.CharacterControls.Player;
 using Characters.EnemyControls;
 using Helpers.PathFinding;
 using Helpers.RangeFinding;
 using Rooms;
+using System;
 using System.Collections.Generic;
 using Tiles;
 using UnityEngine;
@@ -26,22 +28,25 @@ namespace Managers.Rooms
         private Room _currentRoom;
         private IPlayer _player;
 
+        public event Action OnLoadRoom; 
+
         public void Initialize(IPlayer player)
         {
             _player = player;
+            _player.MovementEvents.OnCharacterStopped += MovementEvents_OnCharacterStopped;
         }
 
-        /*private void Player_OnStopped(OverlayTile stoppedTile)
+        private void MovementEvents_OnCharacterStopped(CharacterMovementEvents arg1, CharacterStoppedEventArgs arg2)
         {
             var exitTilePosition = _currentRoom.GetExitPosition();
 
-            if (stoppedTile.GetGridLocation2D() == exitTilePosition.Value)
+            if (arg2.StandingTile.GetPosition2D() == exitTilePosition.Value)
             {
-                print("EXIT");
+                print("Load next room");
                 DeleteCurrentRoom();
                 LoadRoom();
             }
-        }*/
+        }
 
         public Dictionary<Vector2Int, OverlayTile> GetMap()
         {
@@ -97,17 +102,29 @@ namespace Managers.Rooms
             RangeFinder.UpdateWithNewMap(_roomMap); 
             RangeFinder.HideTiles();
 
-            _currentRoom.Initialize(_player, _roomMap, new List<Enemy> { _enemiesDb.GetRandom() });
+            InitializeRoom();
         }
 
         private void DeleteCurrentRoom()
         {
-            foreach (var item in _roomMap)
+            RangeFinder.HideTiles();
+            Destroy(_currentRoom.gameObject);
+
+            OnLoadRoom?.Invoke();
+        }
+
+        private void InitializeRoom()
+        {
+            var enemiesToSpawn = new List<Enemy>();
+            var enemiesToSpawnCount = _currentRoom.GetEnemiesToSpawnCount();
+
+            while(enemiesToSpawnCount > 0)
             {
-                Destroy(item.Value.gameObject);
+                enemiesToSpawn.Add(_enemiesDb.GetRandom());
+                enemiesToSpawnCount--;
             }
 
-            Destroy(_currentRoom.gameObject);
+            _currentRoom.Initialize(_player, _roomMap, enemiesToSpawn);
         }
     }
 }

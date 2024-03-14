@@ -15,22 +15,17 @@ namespace Characters.CharacterControls.Movement
 
         private List<OverlayTile> _path;
 
-        private float _moveSpeed;
-        private int _moveRage;
-
         private CharacterMovementEvents _movementEvents;
 
-        public void Initialize(ICharacter character, CharacterMovementStats movementStats, CharacterMovementEvents movementEvents)
+        public void Initialize(ICharacter character, CharacterMovementEvents movementEvents)
         {
             _character = character;
             _movementEvents = movementEvents;
-            _moveSpeed = movementStats.MoveSpeed;
-            _moveRage = movementStats.MoveDistance;
         }
 
         public void Move(OverlayTile clickedTile)
         {
-            var tilesInRange = GetTilesInRange().Where(x => x.IsAvailable).ToList();
+            var tilesInRange = GetAvailableTilesInRange();
 
             if (tilesInRange.Contains(clickedTile))
             {
@@ -48,7 +43,7 @@ namespace Characters.CharacterControls.Movement
             {
                 var targetPosition = _path[0].transform.position;
                 var zIndex = targetPosition.z;
-                var step = _moveSpeed * Time.deltaTime;
+                var step = _character.GetMoveSpeed() * Time.deltaTime;
 
                 while (Vector2.Distance(transform.position, targetPosition) > 0.00001f)
                 {
@@ -61,28 +56,21 @@ namespace Characters.CharacterControls.Movement
                 _path.RemoveAt(0);
             }
 
-            _character.UseActionPoint();
-
             if(_character.GetRemainingActionsCount() <= 0)
             {
                 RangeFinder.HideTiles();
             }
             else
             {
-                ShowTilesInRange();
+                RangeFinder.ShowTilesInRange(_character.GetStandingTile(), _character.GetMoveRange());
             }
 
             _movementEvents.CallStoppedEvent(_character.GetStandingTile(), _character);
         }
 
-        public List<OverlayTile> GetTilesInRange()
+        private List<OverlayTile> GetAvailableTilesInRange()
         {
-            return RangeFinder.GetTilesInRange(_character.GetStandingTile(), _moveRage);
-        }
-
-        public void ShowTilesInRange()
-        {
-            RangeFinder.ShowTilesInRange(_character.GetStandingTile(), _moveRage);
+            return RangeFinder.GetTilesInRange(_character.GetStandingTile(), _character.GetMoveRange()).Where(x => x.IsAvailable).ToList();
         }
     }
 }

@@ -5,17 +5,21 @@ using Tiles;
 
 public interface ICharacter
 {
-    CharacterStatsBase Stats { get; }
     CharacterHealthEvents HealthEvents { get; }
     CharacterMovementEvents MovementEvents { get; }
     CharacterAttackEvents AttackEvents { get; }
 
-    void UseActionPoint();
-    void ResetSelectedAction();
     int GetRemainingActionsCount();
     int GetActionsPerTurnCount();
 
+    int GetAttackDamage();
+    int GetAttackRange();
+
+    float GetMoveSpeed();
+    int GetMoveRange();
+
     int GetHealth();
+    int GetMaxHealth();
     void TakeDamage(int damageAmmount);
 
     public OverlayTile GetStandingTile();

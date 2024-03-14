@@ -6,6 +6,10 @@ using UnityEngine.Tilemaps;
 
 public class RoomController : MonoBehaviour
 {
+    [Header("CONFIGURATION")]
+    [SerializeField][Min(0)] private int _enemiesToSpawnCount = 1; // How many enemies will spawn in the room
+
+    [Header("ROOM STRUCTURE")]
     [SerializeField] private Tilemap _groundMap;
     [SerializeField] private Tilemap _entranceMap;
     [SerializeField] private Tilemap _exitMap;
@@ -15,8 +19,16 @@ public class RoomController : MonoBehaviour
     private void Start()
     {
         // Hide the entrance and exit tiles
-        // _entranceMap.color = new Color(1f, 1f, 1f, 0f);
-        // _exitMap.color = new Color(1f, 1f, 1f, 0f);
+       // _entranceMap.color = new Color(1f, 1f, 1f, 0f);
+       // _exitMap.color = new Color(1f, 1f, 1f, 0f);
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var enemy in FindObjectsOfType<Enemy>())
+        {
+            Destroy(enemy);
+        }
     }
 
     public void Initialize(IPlayer player, Dictionary<Vector2Int, OverlayTile> roomMap, List<Enemy> enemies)
@@ -24,6 +36,11 @@ public class RoomController : MonoBehaviour
         _spawnedEnemies = new();
         PositionPlayerAtEntrance(player, roomMap);
         PositionEnemies(enemies, roomMap);
+    }
+
+    public int GetEnemiesToSpawnCont()
+    {
+        return _enemiesToSpawnCount;
     }
 
     public List<IEnemy> GetEnemies()

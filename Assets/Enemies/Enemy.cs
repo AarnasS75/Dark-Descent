@@ -34,6 +34,13 @@ namespace Characters.EnemyControls
             {
                 p_movementController.Move(actionScenario.MoveToTile);
             }
+
+            UseActionPoint();
+        }
+
+        public int GetExp()
+        {
+            return 100;
         }
     }
 }

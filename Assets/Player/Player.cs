@@ -1,22 +1,36 @@
 using Constants;
+using Helpers.RangeFinding;
 using Tiles;
 
 namespace Characters.CharacterControls.Player
 {
     public class Player : CharacterBase, IPlayer
     {
+        public LevelSystem LevelSystem { get; private set; }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            LevelSystem = new LevelSystem(this);
+        }
+
         public void SelectAction(CombatActionType actionType)
         {
             p_selectedAction = actionType;
 
             switch (p_selectedAction)
             {
+                case CombatActionType.None:
+                    ResetSelectedAction();
+                    break;
+
                 case CombatActionType.Move:
-                    p_movementController.ShowTilesInRange();
+                    RangeFinder.ShowTilesInRange(p_standingTile, p_stats.MovementStats.MoveDistance);
                     break;
 
                 case CombatActionType.Attack:
-                    p_attackController.MarkTilesInAttackRange();
+                    RangeFinder.HideTiles();
+                    RangeFinder.MarkEnemiesInRangeTiles(p_standingTile, p_stats.AttackStats.AttackRange);
                     break;
             }
         }
@@ -38,6 +52,8 @@ namespace Characters.CharacterControls.Player
                     p_attackController.Attack(actionTile);
                     break;
             }
+
+            UseActionPoint();
         }
 
         private bool CanTakeAction(OverlayTile selectedTile)
@@ -54,6 +70,5 @@ namespace Characters.CharacterControls.Player
 
             return true;
         }
-
     }
 }

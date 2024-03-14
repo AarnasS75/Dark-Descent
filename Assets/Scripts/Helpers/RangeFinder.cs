@@ -96,7 +96,8 @@ namespace Helpers.RangeFinding
 
         public static void MarkEnemiesInRangeTiles(OverlayTile standingTile, int attackRange)
         {
-            var rangeFinderTiles = GetTilesInRange(standingTile, attackRange).Where(x => !x.IsAvailable);
+            var rangeFinderTiles = GetTilesInRange(standingTile, attackRange).Where(x => !x.IsAvailable && x.GetPosition2D() != standingTile.GetPosition2D());
+
             foreach (var item in rangeFinderTiles)
             {
                 item.Mark();

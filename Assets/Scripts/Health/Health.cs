@@ -1,4 +1,5 @@
 using Characters.CharacterControls.HealthEvents;
+using System;
 using UnityEngine;
 
 namespace Characters.HealthControls
@@ -24,11 +25,22 @@ namespace Characters.HealthControls
             _currentHealth -= damage;
 
             _healthEvents.CallHealthChangedEvent(_character, (float)_currentHealth / (float)_maxHealth, damage);
+
+            if(_currentHealth <= 0)
+            {
+                _healthEvents.CallCharacterDiedEvent(_character);
+                Destroy(gameObject);
+            }
         }
 
         public int GetCurrentHealth()
         {
             return _currentHealth;
+        }
+
+        public int GetMaxHealth()
+        {
+            return _maxHealth;
         }
     }
 }

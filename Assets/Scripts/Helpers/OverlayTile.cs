@@ -1,4 +1,5 @@
 using Characters.CharacterControls;
+using Characters.CharacterControls.HealthEvents;
 using UnityEngine;
 
 namespace Tiles
@@ -26,6 +27,7 @@ namespace Tiles
 
         public void PlaceCharacter(ICharacter characterToPlace)
         {
+            characterToPlace.HealthEvents.OnDied += HealthEvents_OnDied;
             var character = characterToPlace as CharacterBase;
 
             character.transform.position = new Vector3(transform.position.x, transform.position.y + 0.0001f, transform.position.z);
@@ -38,8 +40,14 @@ namespace Tiles
             }
         }
 
+        private void HealthEvents_OnDied(CharacterHealthEvents arg1, CharacterDiedEventArgs arg2)
+        {
+            ResetTile();
+        }
+
         private void ResetTile()
         {
+            _standingCharacter.HealthEvents.OnDied -= HealthEvents_OnDied;
             _standingCharacter = null;
         }
 

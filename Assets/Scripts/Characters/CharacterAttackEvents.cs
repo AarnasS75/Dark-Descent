@@ -7,12 +7,13 @@ namespace Characters.CharacterControls.AttackEvents
     {
         public event Action<CharacterAttackEvents, CharacterAttackedEventArgs> OnAttacked;
 
-        public void CallAttackEvent(OverlayTile enemyTile, ICharacter character)
+        public void CallAttackEvent(OverlayTile enemyTile, ICharacter attacker, ICharacter target)
         {
             OnAttacked?.Invoke(this, new CharacterAttackedEventArgs
             {
                 EnemyTile = enemyTile,
-                Character = character
+                Attacker = attacker,
+                Target = target
             });
         }
     }
@@ -20,6 +21,7 @@ namespace Characters.CharacterControls.AttackEvents
     public class CharacterAttackedEventArgs : EventArgs
     {
         public OverlayTile EnemyTile;
-        public ICharacter Character;
+        public ICharacter Attacker;
+        public ICharacter Target;
     }
 }

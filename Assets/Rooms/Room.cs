@@ -11,36 +11,41 @@ namespace Rooms
     [DisallowMultipleComponent]
     public class Room : MonoBehaviour
     {
-        public RoomController Controller { get; private set; }
+        private RoomController _controller;
 
         private void Awake()
         {
-            Controller = GetComponent<RoomController>();
+            _controller = GetComponent<RoomController>();
         }
 
         public void Initialize(IPlayer player, Dictionary<Vector2Int, OverlayTile> roomMap, List<Enemy> enemies)
         {
-            Controller.Initialize(player, roomMap, enemies);
+            _controller.Initialize(player, roomMap, enemies);
         }
 
         public Tilemap GetRoomGroundMap()
         {
-            return Controller.GetRoomGroundMap();
+            return _controller.GetRoomGroundMap();
         }
 
         public Vector2Int? GetExitPosition()
         {
-            return Controller.GetExitPosition();
+            return _controller.GetExitPosition();
         }
 
         public Vector2Int? GetEntrancePosition()
         {
-            return Controller.GetEntrancePosition();
+            return _controller.GetEntrancePosition();
         }
 
         public List<IEnemy> GetEnemies()
         {
-            return Controller.GetEnemies();
+            return _controller.GetEnemies();
+        }
+
+        public int GetEnemiesToSpawnCount()
+        {
+            return _controller.GetEnemiesToSpawnCont();
         }
     }
 }

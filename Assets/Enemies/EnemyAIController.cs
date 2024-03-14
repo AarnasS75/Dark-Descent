@@ -26,7 +26,7 @@ namespace Characters.EnemyControls
 
             var senario = new ActionScenario();
 
-            var tileInMovementRange = RangeFinder.GetTilesInRange(_standingOnTile, _enemy.Stats.MovementStats.MoveDistance);
+            var tileInMovementRange = RangeFinder.GetTilesInRange(_standingOnTile, _enemy.GetMoveRange());
 
             foreach (var tile in tileInMovementRange)
             {
@@ -52,9 +52,9 @@ namespace Characters.EnemyControls
                 {
                     var senarioFullPath = PathFinder.FindPath(_standingOnTile, _player.GetStandingTile(), new List<OverlayTile>());
 
-                    if (senarioFullPath.Count > _enemy.Stats.AttackStats.AttackRange + _enemy.Stats.MovementStats.MoveDistance)
+                    if (senarioFullPath.Count > _enemy.GetAttackRange() + _enemy.GetMoveRange())
                     {
-                        var senarioPath = senarioFullPath.GetRange(0, _enemy.Stats.MovementStats.MoveDistance);
+                        var senarioPath = senarioFullPath.GetRange(0, _enemy.GetMoveRange());
                         var senarioValue = senarioPath.Count - _player.GetHealth();
 
                         if (senarioValue < senario.ScenarioValue || !senario.MoveToTile)
@@ -84,11 +84,11 @@ namespace Characters.EnemyControls
             {
                 var closestDistance = PathFinder.GetManhattenDistance(tempTile, _player.GetStandingTile());
 
-                if (_enemy.Stats.AttackStats.AttackRange >= closestDistance)
+                if (_enemy.GetAttackRange() >= closestDistance)
                 {
-                    var scenarioValue = _enemy.Stats.AttackStats.AttackDamage + closestDistance - _player.GetHealth();
+                    var scenarioValue = _enemy.GetAttackDamage() + closestDistance - _player.GetHealth();
 
-                    if(_player.GetHealth() - _enemy.Stats.AttackStats.AttackDamage <= 0)
+                    if(_player.GetHealth() - _enemy.GetAttackDamage() <= 0)
                     {
                         scenarioValue = 10000;
                     }

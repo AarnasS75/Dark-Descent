@@ -1,7 +1,9 @@
+using Characters.CharacterControls.HealthEvents;
 using Characters.CharacterControls.Player;
 using Constants;
 using Managers.InpuHandling;
 using Managers.Rooms;
+using System;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -12,7 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CanvasManager _canvasManager;
     [SerializeField] private TurnManager _turnManager;
 
-    [Header("PLAYER REFERENCE")]
+    [Header("PLAYER")]
     [SerializeField] private GameObject _playerPrefab;
     private Player _player;
 
@@ -23,12 +25,24 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        _turnManager.OnEndTurn += _turnSystem_OnTurnStarted;
+        _turnManager.OnCharacterTurn += _turnSystem_OnCharacterTurn;
     }
 
     private void OnDisable()
     {
-        _turnManager.OnEndTurn -= _turnSystem_OnTurnStarted;
+        _turnManager.OnCharacterTurn -= _turnSystem_OnCharacterTurn;
+    }
+
+    private void _turnSystem_OnCharacterTurn(ICharacter character)
+    {
+        if(character is IPlayer player)
+        {
+            _canvasManager.GetTab<GameplayTab>().ShowPlayerActions();
+        }
+        else
+        {
+            _canvasManager.GetTab<GameplayTab>().HidePlayerActions();
+        }
     }
 
     private void UpdateGameState(GameState newGameState)
@@ -46,27 +60,10 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.GameEnded:
+                print("gg");
                 break;
 
             case GameState.GamePaused:
-                break;
-        }
-    }
-
-    private void _turnSystem_OnTurnStarted(TurnState turnState)
-    {
-        switch (turnState)
-        {
-            case TurnState.PlayerTurn:
-                _canvasManager.GetTab<GameplayTab>().ShowPlayerActions();
-                break;
-
-            case TurnState.EnemyTurn:
-                _canvasManager.GetTab<GameplayTab>().HidePlayerActions();
-                break;
-
-            case TurnState.EnvironmentTurn:
-                //_canvasManager.GetTab<GameplayTab>().HidePlayerActions();
                 break;
         }
     }
@@ -78,6 +75,12 @@ public class GameManager : MonoBehaviour
         {
             _player = Instantiate(_playerPrefab).GetComponent<Player>();
         }
+        _player.HealthEvents.OnDied += PlayerHealthEvents_OnDied;
+    }
+
+    private void PlayerHealthEvents_OnDied(CharacterHealthEvents arg1, CharacterDiedEventArgs arg2)
+    {
+        UpdateGameState(GameState.GameEnded);
     }
 
     private void InitializeManagers()
