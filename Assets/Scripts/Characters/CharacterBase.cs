@@ -53,8 +53,6 @@ namespace Characters.CharacterControls
             _attackController.Initialize(this, AttackEvents);
         }
 
-        #region Getters Actions Stuff
-
         public void SelectAction(CombatActionType selectedAction)
         {
             _selectedAction = selectedAction;
@@ -96,6 +94,8 @@ namespace Characters.CharacterControls
                     break;
             }
         }
+
+        #region Getters Actions Stuff
 
         public int GetRemainingActionsCount()
         {
