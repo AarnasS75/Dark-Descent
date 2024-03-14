@@ -4,6 +4,6 @@ using Tiles;
 
 public interface IPlayer : ICharacter
 {
-    CombatAction SelectAction(CombatActionType actionType);
+    void SelectAction(CombatActionType actionType);
     void TakeAction(OverlayTile actionTile);
 }

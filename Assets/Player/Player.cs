@@ -1,23 +1,24 @@
-using Characters.Actions;
-using Characters.CharacterControls.Attack;
-using Characters.CharacterControls.Movement;
 using Constants;
-using System.Linq;
 using Tiles;
-using UnityEngine;
 
 namespace Characters.CharacterControls.Player
 {
     public class Player : CharacterBase, IPlayer
     {
-        protected override void Awake()
+        public void SelectAction(CombatActionType actionType)
         {
-            base.Awake();
-        }
+            p_selectedAction = actionType;
 
-        protected override void Start()
-        {
-            base.Start();
+            switch (p_selectedAction)
+            {
+                case CombatActionType.Move:
+                    p_movementController.ShowTilesInRange();
+                    break;
+
+                case CombatActionType.Attack:
+                    p_attackController.MarkTilesInAttackRange();
+                    break;
+            }
         }
 
         public void TakeAction(OverlayTile actionTile)
@@ -27,35 +28,32 @@ namespace Characters.CharacterControls.Player
                 return;
             }
 
-            switch (p_selectedAction.ActionType)
+            switch (p_selectedAction)
             {
                 case CombatActionType.Move:
                     p_movementController.Move(actionTile);
                     break;
 
                 case CombatActionType.Attack:
-
+                    p_attackController.Attack(actionTile);
                     break;
             }
         }
 
-        public CombatAction SelectAction(CombatActionType actionType)
+        private bool CanTakeAction(OverlayTile selectedTile)
         {
-            p_selectedAction = p_stats.CombatActions.First(x => x.ActionType.Equals(actionType));
-
-            switch (p_selectedAction.ActionType)
+            if (selectedTile == null || p_selectedAction == CombatActionType.None)
             {
-                case CombatActionType.Move:
-                    p_movementController.ShowTilesInRange();
-                    break;
-
-                case CombatActionType.Attack:
-                    p_movementController.ShowTilesInRange();
-                    p_attackController.MarkTilesInAttackRange();
-                    break;
+                return false;
             }
 
-            return p_selectedAction;
+            if (_availableActionsCount - 1 < 0)
+            {
+                return false;
+            }
+
+            return true;
         }
+
     }
 }

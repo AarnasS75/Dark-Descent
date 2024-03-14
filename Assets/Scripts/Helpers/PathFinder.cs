@@ -26,7 +26,7 @@ namespace Helpers.PathFinding
             {
                 foreach (var item in inRangeTiles)
                 {
-                    _searchableTiles.Add(item.GetGridLocation2D(), _map[item.GetGridLocation2D()]);
+                    _searchableTiles.Add(item.GetPosition2D(), _map[item.GetPosition2D()]);
                 }
             }
             else

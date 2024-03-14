@@ -1,8 +1,5 @@
-using Characters.CharacterControls.Attack;
-using Characters.CharacterControls.Movement;
 using Helpers.PathFinding;
 using Helpers.RangeFinding;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Tiles;
@@ -17,29 +14,19 @@ namespace Characters.EnemyControls
 
         private OverlayTile _standingOnTile;
 
-        private CharacterAttackController _attackController;
-        private CharacterMovementController _movementController;
-
-        public void Initialize(IEnemy enemy, CharacterMovementController movementController, CharacterAttackController attackController)
+        public void Initialize(IEnemy enemy)
         {
             _enemy = enemy;
-            _attackController = attackController;
-            _movementController = movementController;
         }
 
-        public void StartActionRoutine(IPlayer player)
+        public ActionScenario GetScenario(IPlayer player)
         {
             _player = player;
             _standingOnTile = _enemy.GetStandingTile();
 
-            ScenarioRecoursively();
-        }
-
-        private void ScenarioRecoursively()
-        {
             var senario = new ActionScenario();
 
-            var tileInMovementRange = RangeFinder.GetTilesInRange(_standingOnTile.GetGridLocation2D(), _enemy.Stats.MovementStats.MoveDistance);
+            var tileInMovementRange = RangeFinder.GetTilesInRange(_standingOnTile, _enemy.Stats.MovementStats.MoveDistance);
 
             foreach (var tile in tileInMovementRange)
             {
@@ -78,23 +65,14 @@ namespace Characters.EnemyControls
                 }
             }
 
-            senario.MoveToTile.Show();
-            _standingOnTile.ResetTile();
-
-            // If doesn't need to get closer and tile to attack is in range
-            if (senario.MoveToTile.GetGridLocation2D() == _standingOnTile.GetGridLocation2D() && senario.AttackTile != null)
-            {
-                _attackController.Attack(senario.AttackTile);
-            }
-            // If needs to get closer and after moving, tile to attack would still not be in range
-            else
-            {
-                _movementController.Move(senario.MoveToTile);
-            }
+            return senario;
         }
         
         private ActionScenario CreateTileSenarioValue(OverlayTile tempTile)
         {
+            // NOTE: Can be extended if added character personality types.
+            // For example aggresive ones prioritize attacking player, support ones focus on protecting alies, etc.
+
             var attackScnario = StartegicPlayerAttack(tempTile);
 
             return attackScnario;
@@ -120,11 +98,6 @@ namespace Characters.EnemyControls
             }
 
             return new ActionScenario();
-        }
-
-        private bool HasActionAvailable()
-        {
-            return _enemy.Stats.CombatActions.Any(x => _enemy.GetRemainingActionsCount() - 1 >= 0);
         }
     }
 }

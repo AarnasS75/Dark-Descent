@@ -15,24 +15,23 @@ namespace Helpers.RangeFinding
             _map = map;
         }
 
-        public static List<OverlayTile> GetTilesInRange(Vector2Int location, int range)
+        public static List<OverlayTile> GetTilesInRange(OverlayTile standingTile, int range)
         {
-            var startingTile = _map[location];
             var inRangeTiles = new List<OverlayTile>();
             int stepCount = 0;
 
-            inRangeTiles.Add(startingTile);
+            inRangeTiles.Add(standingTile);
 
             //Should contain the surroundingTiles of the previous step. 
             var tilesForPreviousStep = new List<OverlayTile>();
-            tilesForPreviousStep.Add(startingTile);
+            tilesForPreviousStep.Add(standingTile);
             while (stepCount < range)
             {
                 var surroundingTiles = new List<OverlayTile>();
 
                 foreach (var item in tilesForPreviousStep)
                 {
-                    surroundingTiles.AddRange(GetSurroundingTiles(item.GetGridLocation2D()));
+                    surroundingTiles.AddRange(GetSurroundingTiles(item.GetPosition2D()));
                 }
 
                 inRangeTiles.AddRange(surroundingTiles);
@@ -78,16 +77,16 @@ namespace Helpers.RangeFinding
             return surroundingTiles;
         }
 
-        public static void ShowTilesInRange(Vector2Int standingTilePosition, int range)
+        public static void ShowTilesInRange(OverlayTile standingTile, int range)
         {
-            var rangeFinderTiles = GetTilesInRange(standingTilePosition, range);
+            var rangeFinderTiles = GetTilesInRange(standingTile, range);
             foreach (var item in rangeFinderTiles)
             {
                 item.Show();
             }
         }
 
-        public static void HideRangeTiles()
+        public static void HideTiles()
         {
             foreach (var item in _map)
             {
@@ -95,9 +94,9 @@ namespace Helpers.RangeFinding
             }
         }
 
-        public static void MarkEnemiesInRangeTiles(Vector2Int standingTilePosition, int attackRange)
+        public static void MarkEnemiesInRangeTiles(OverlayTile standingTile, int attackRange)
         {
-            var rangeFinderTiles = GetTilesInRange(standingTilePosition, attackRange).Where(x => !x.IsAvailable);
+            var rangeFinderTiles = GetTilesInRange(standingTile, attackRange).Where(x => !x.IsAvailable);
             foreach (var item in rangeFinderTiles)
             {
                 item.Mark();

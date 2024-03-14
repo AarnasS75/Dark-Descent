@@ -2,7 +2,9 @@ using Characters.CharacterControls.AttackEvents;
 using Characters.CharacterControls.MovementEvents;
 using Constants;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnManager : MonoBehaviour
@@ -75,14 +77,7 @@ public class TurnManager : MonoBehaviour
     {
         if(args.Character is IEnemy enemy)
         {
-            if(enemy.GetRemainingActionsCount() > 0)
-            {
-                enemy.TakeAction(_player);
-            }
-            else
-            {
-                GetNextEnemyTurn();
-            }
+            StartCoroutine(GetNextEnemyTurn(enemy));
         }
     }
 
@@ -90,36 +85,45 @@ public class TurnManager : MonoBehaviour
     {
         if (args.Character is IEnemy enemy)
         {
-            GetNextEnemyTurn();
+            StartCoroutine(GetNextEnemyTurn(enemy));
         }
     }
 
-    private void GetNextEnemyTurn()
+    private IEnumerator GetNextEnemyTurn(IEnemy enemy)
     {
-        _currentEnemyIndex++;
-        if (_currentEnemyIndex >= _enemies.Count)
+        yield return new WaitForSeconds(1.3f);
+
+        if (enemy.GetRemainingActionsCount() > 0)
         {
-            // All enemies have finished their turns, switch back to player's turn
-            _currentEnemyIndex = 0;
-            UpdateTurnState(TurnState.PlayerTurn);
+            enemy.TakeAction(_player);
         }
         else
         {
-            // Start the turn for the next enemy
-            _enemies[_currentEnemyIndex].ResetAction();
-            _enemies[_currentEnemyIndex].TakeAction(_player);
+            _currentEnemyIndex++;
+            if (_currentEnemyIndex >= _enemies.Count)
+            {
+                // All enemies have finished their turns, switch back to player's turn
+                _currentEnemyIndex = 0;
+                UpdateTurnState(TurnState.PlayerTurn);
+            }
+            else
+            {
+                // Start the turn for the next enemy
+                _enemies[_currentEnemyIndex].ResetSelectedAction();
+                _enemies[_currentEnemyIndex].TakeAction(_player);
+            }
         }
     }
 
     private void EnemyTurn()
     {
         // Start the turn for the first enemy
-        _enemies[_currentEnemyIndex].ResetAction();
+        _enemies[_currentEnemyIndex].ResetSelectedAction();
         _enemies[_currentEnemyIndex].TakeAction(_player);
     }
 
     private void PlayerTurn()
     {
-        _player.ResetAction();
+        _player.ResetSelectedAction();
     }
 }

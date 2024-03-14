@@ -17,12 +17,23 @@ namespace Characters.EnemyControls
         protected override void Start()
         {
             base.Start();
-            _aIController.Initialize(this, p_movementController, p_attackController);
+            _aIController.Initialize(this);
         }
 
         public void TakeAction(IPlayer player)
         {
-            _aIController.StartActionRoutine(player);
+            var actionScenario = _aIController.GetScenario(player);
+
+            // If doesn't need to get closer and tile to attack is in range
+            if (actionScenario.MoveToTile.GetPosition2D() == p_standingTile.GetPosition2D() && actionScenario.AttackTile != null)
+            {
+                p_attackController.Attack(actionScenario.AttackTile);
+            }
+            // If needs to get closer and after moving, tile to attack would still not be in range
+            else
+            {
+                p_movementController.Move(actionScenario.MoveToTile);
+            }
         }
     }
 }

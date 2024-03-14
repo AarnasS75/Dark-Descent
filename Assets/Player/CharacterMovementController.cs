@@ -30,12 +30,13 @@ namespace Characters.CharacterControls.Movement
 
         public void Move(OverlayTile clickedTile)
         {
-            HideRangeTiles();
-
             var tilesInRange = GetTilesInRange().Where(x => x.IsAvailable).ToList();
 
             if (tilesInRange.Contains(clickedTile))
             {
+                RangeFinder.HideTiles();
+                clickedTile.ShowMoveTo();
+
                 _path = PathFinder.FindPath(_character.GetStandingTile(), clickedTile, tilesInRange);
                 StartCoroutine(MoveRoutine());
             }
@@ -56,29 +57,32 @@ namespace Characters.CharacterControls.Movement
                     yield return null;
                 }
                 transform.position = new Vector3(targetPosition.x, targetPosition.y, zIndex);
-                _character.SetPosition(_path[0]);
+                _path[0].PlaceCharacter(_character);
                 _path.RemoveAt(0);
             }
 
-            yield return new WaitForSeconds(1.5f);
-
             _character.UseActionPoint();
+
+            if(_character.GetRemainingActionsCount() <= 0)
+            {
+                RangeFinder.HideTiles();
+            }
+            else
+            {
+                ShowTilesInRange();
+            }
+
             _movementEvents.CallStoppedEvent(_character.GetStandingTile(), _character);
         }
 
         public List<OverlayTile> GetTilesInRange()
         {
-            return RangeFinder.GetTilesInRange(_character.GetStandingTile().GetGridLocation2D(), _moveRage);
+            return RangeFinder.GetTilesInRange(_character.GetStandingTile(), _moveRage);
         }
 
         public void ShowTilesInRange()
         {
-            RangeFinder.ShowTilesInRange(_character.GetStandingTile().GetGridLocation2D(), _moveRage);
-        }
-
-        public void HideRangeTiles()
-        {
-            RangeFinder.HideRangeTiles();
+            RangeFinder.ShowTilesInRange(_character.GetStandingTile(), _moveRage);
         }
     }
 }

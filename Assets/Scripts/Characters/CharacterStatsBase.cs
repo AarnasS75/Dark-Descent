@@ -7,16 +7,21 @@ using UnityEngine;
 [System.Serializable]
 public class CharacterMovementStats
 {
-    [Min(1)] public float MoveSpeed = 3;
-    [Min(1)] public int MoveDistance = 3;
+    [SerializeField][Min(0)] private float _moveSpeed = 2.5f;
+    [SerializeField][Min(0)] private int _moveDistance = 3;
+
+    public float MoveSpeed => _moveSpeed;
+    public int MoveDistance => _moveDistance;
 }
 
 [System.Serializable]
 public class CharacterAttackStats
 {
-    [Min(1)] public int AttackRange = 3;
-    [Min(1)] public int MoveDistance = 3;
-    [Min(0)] public int AttackDamage = 3;
+    [SerializeField][Min(0)] private int _attackDamage = 3;
+    [SerializeField][Min(0)] private int _attackRange = 3;
+
+    public int AttackDamage => _attackDamage;
+    public int AttackRange => _attackRange;
 }
 
 public abstract class CharacterStatsBase : ScriptableObject
@@ -24,7 +29,6 @@ public abstract class CharacterStatsBase : ScriptableObject
     [Header("BASE STATS")]
     [SerializeField][Min(0)] private int _health = 100;
     [SerializeField][Min(1)] private int _actionsPerTurnCount = 3;
-    [SerializeField] private List<CombatAction> _characterActions;
 
     [Header("MOVEMENT STATS")]
     [SerializeField] private CharacterMovementStats _movementStats;
@@ -36,10 +40,4 @@ public abstract class CharacterStatsBase : ScriptableObject
     public int ActionsPerTurnCount => _actionsPerTurnCount;
     public CharacterAttackStats AttackStats => _attackStats;
     public CharacterMovementStats MovementStats => _movementStats;
-    public List<CombatAction> CombatActions => _characterActions;
-
-    public CombatAction? GetAction(CombatActionType actionType)
-    {
-        return CombatActions.FirstOrDefault(x => x.ActionType == actionType);
-    }
 }

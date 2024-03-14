@@ -24,17 +24,24 @@ namespace Characters.CharacterControls.Attack
         public void Attack(OverlayTile selectedTile)
         {
             _targetTile = selectedTile;
+            StartAttackRoutine();
+        }
 
+        private void StartAttackRoutine()
+        {
             StartCoroutine(AttackRoutine());
         }
 
         private IEnumerator AttackRoutine()
         {
+            RangeFinder.HideTiles();
+            _targetTile.Mark();
+
             var target = _targetTile.GetStandingCharacter();
 
             target.TakeDamage(_character.Stats.AttackStats.AttackDamage);
 
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(1f);
 
             _character.UseActionPoint();
             _attackEvents.CallAttackEvent(_targetTile, _character);
@@ -42,7 +49,8 @@ namespace Characters.CharacterControls.Attack
 
         public void MarkTilesInAttackRange()
         {
-            RangeFinder.MarkEnemiesInRangeTiles(_character.GetStandingTile().GetGridLocation2D(), _attackStats.AttackRange);
+            RangeFinder.HideTiles();
+            RangeFinder.MarkEnemiesInRangeTiles(_character.GetStandingTile(), _attackStats.AttackRange);
         }
     }
 }

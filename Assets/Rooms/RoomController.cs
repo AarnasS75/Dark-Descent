@@ -1,11 +1,8 @@
-using Characters.CharacterControls.Player;
 using Characters.EnemyControls;
 using System.Collections.Generic;
-using System.Linq;
 using Tiles;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.WSA;
 
 public class RoomController : MonoBehaviour
 {
@@ -14,8 +11,6 @@ public class RoomController : MonoBehaviour
     [SerializeField] private Tilemap _exitMap;
 
     private List<IEnemy> _spawnedEnemies;
-
-    public bool SpawnEnemyAtExit = true;
 
     private void Start()
     {
@@ -73,8 +68,6 @@ public class RoomController : MonoBehaviour
 
     private void PositionEnemies(List<Enemy> enemies, Dictionary<Vector2Int, OverlayTile> roomMap)
     {
-        var exitPos = roomMap.First(x => x.Key == GetExitPosition());
-
         var availablePositions = GetAvailablePositions(roomMap);
 
         foreach (var enemy in enemies)
@@ -88,7 +81,7 @@ public class RoomController : MonoBehaviour
                 if (availablePosition != null && roomMap.TryGetValue(availablePosition, out var tile))
                 {
                     var enemyToSpawn = Instantiate(enemy);
-                    enemyToSpawn.SetPosition(SpawnEnemyAtExit ? exitPos.Value : tile);
+                    tile.PlaceCharacter(enemyToSpawn);
 
                     _spawnedEnemies.Add(enemyToSpawn);
                     break;
@@ -119,7 +112,7 @@ public class RoomController : MonoBehaviour
 
         if (entranceTilePosition != null && roomMap.TryGetValue(entranceTilePosition.Value, out var tile))
         {
-            player.SetPosition(tile);
+            tile.PlaceCharacter(player);
         }
     }
 }

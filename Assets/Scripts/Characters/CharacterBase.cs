@@ -34,8 +34,8 @@ namespace Characters.CharacterControls
         protected CharacterMovementController p_movementController;
         protected CharacterAttackController p_attackController;
 
-        protected OverlayTile p_standingOnTile;
-        protected CombatAction p_selectedAction;
+        protected OverlayTile p_standingTile;
+        protected CombatActionType p_selectedAction;
 
         protected int _availableActionsCount;
 
@@ -58,18 +58,6 @@ namespace Characters.CharacterControls
             p_attackController.Initialize(this, p_stats.AttackStats, AttackEvents);
         }
 
-        public void SetPosition(OverlayTile tile)
-        {
-            transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y + 0.0001f, tile.transform.position.z);
-            p_standingOnTile = tile;
-            p_standingOnTile.Occupy(this);
-
-            if (p_standingOnTile.Previous != null)
-            {
-                p_standingOnTile.Previous.ResetTile();
-            }
-        }
-
         public int GetAvailableActionPoints()
         {
             return _availableActionsCount;
@@ -80,30 +68,9 @@ namespace Characters.CharacterControls
             _availableActionsCount--;
         }
 
-        public List<CombatAction> GetAvailableActions()
+        public void ResetSelectedAction()
         {
-            return p_stats.CombatActions.Where(x => _availableActionsCount - 1 >= 0).ToList();
-        }
-
-        public bool TryGetNextTurn(out CombatAction combatAction)
-        {
-            combatAction = null;
-
-            foreach (var action in p_stats.CombatActions)
-            {
-                if (_availableActionsCount - 1 >= 0)
-                {
-                    combatAction = action;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void ResetAction()
-        {
-            p_selectedAction = null;
+            p_selectedAction = CombatActionType.None;
             _availableActionsCount = p_stats.ActionsPerTurnCount;
         }
 
@@ -117,26 +84,6 @@ namespace Characters.CharacterControls
             return p_stats.ActionsPerTurnCount;
         }
 
-        public OverlayTile GetStandingTile()
-        {
-            return p_standingOnTile;
-        }
-
-        protected bool CanTakeAction(OverlayTile selectedTile)
-        {
-            if (selectedTile == null || p_selectedAction == null)
-            {
-                return false;
-            }
-
-            if (_availableActionsCount - 1 < 0)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public int GetHealth()
         {
             return p_health.GetCurrentHealth();
@@ -145,6 +92,23 @@ namespace Characters.CharacterControls
         public void TakeDamage(int ammount)
         {
             p_health.TakeDamage(ammount);
+        }
+
+        public void SetStandingTile(OverlayTile standingTile)
+        {
+            p_standingTile = standingTile;
+        }
+
+        public OverlayTile GetStandingTile()
+        {
+            return p_standingTile;
+        }
+
+        public Vector2Int GetPosition2D()
+        {
+            Vector3 position = transform.position;
+            Vector2Int positionInt = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+            return positionInt;
         }
     }
 }

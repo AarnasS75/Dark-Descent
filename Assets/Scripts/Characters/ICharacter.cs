@@ -10,14 +10,13 @@ public interface ICharacter
     CharacterMovementEvents MovementEvents { get; }
     CharacterAttackEvents AttackEvents { get; }
 
-    void SetPosition(OverlayTile standingTile);
-    OverlayTile GetStandingTile();
-
     void UseActionPoint();
-    void ResetAction();
+    void ResetSelectedAction();
     int GetRemainingActionsCount();
     int GetActionsPerTurnCount();
 
     int GetHealth();
     void TakeDamage(int damageAmmount);
+
+    public OverlayTile GetStandingTile();
 }

@@ -1,3 +1,4 @@
+using Characters.CharacterControls;
 using UnityEngine;
 
 namespace Tiles
@@ -23,12 +24,21 @@ namespace Tiles
             _spriteRenderer = GetComponent<SpriteRenderer>();
         }
 
-        public void Occupy(ICharacter character)
+        public void PlaceCharacter(ICharacter characterToPlace)
         {
+            var character = characterToPlace as CharacterBase;
+
+            character.transform.position = new Vector3(transform.position.x, transform.position.y + 0.0001f, transform.position.z);
             _standingCharacter = character;
+            character.SetStandingTile(this);
+
+            if (Previous != null)
+            {
+                Previous.ResetTile();
+            }
         }
 
-        public void ResetTile()
+        private void ResetTile()
         {
             _standingCharacter = null;
         }
@@ -38,7 +48,7 @@ namespace Tiles
             return _standingCharacter;
         }
 
-        public Vector2Int GetGridLocation2D()
+        public Vector2Int GetPosition2D()
         {
             return (Vector2Int)_gridLocation;
         }
@@ -61,6 +71,11 @@ namespace Tiles
         public void Show()
         {
             _spriteRenderer.color = new Color(1, 1, 1, 1);
+        }
+
+        public void ShowMoveTo()
+        {
+            _spriteRenderer.color = Color.cyan;
         }
 
         public void Mark()

@@ -95,7 +95,7 @@ namespace Managers.Rooms
 
             PathFinder.UpdateWithNewMap(_roomMap);
             RangeFinder.UpdateWithNewMap(_roomMap); 
-            RangeFinder.HideRangeTiles();
+            RangeFinder.HideTiles();
 
             _currentRoom.Initialize(_player, _roomMap, new List<Enemy> { _enemiesDb.GetRandom() });
         }
