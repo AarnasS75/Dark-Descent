@@ -16,6 +16,12 @@ namespace Characters.CharacterControls.Movement
         private List<OverlayTile> _path;
 
         private CharacterMovementEvents _movementEvents;
+        private bool _isMoving;
+
+        private void Awake()
+        {
+            _isMoving = false;
+        }
 
         public void Initialize(ICharacter character, CharacterMovementEvents movementEvents)
         {
@@ -23,18 +29,21 @@ namespace Characters.CharacterControls.Movement
             _movementEvents = movementEvents;
         }
 
-        public void Move(OverlayTile clickedTile)
+        public void Move(OverlayTile moveToTile)
         {
             var tilesInRange = GetAvailableTilesInRange();
 
-            if (tilesInRange.Contains(clickedTile))
+            if (_character.GetRemainingActionsCount() <= 0 || !tilesInRange.Contains(moveToTile) || _isMoving)
             {
-                RangeFinder.HideTiles();
-                clickedTile.ShowMoveTo();
-
-                _path = PathFinder.FindPath(_character.GetStandingTile(), clickedTile, tilesInRange);
-                StartCoroutine(MoveRoutine());
+                return;
             }
+
+            _isMoving = true;
+            RangeFinder.HideTiles();
+            moveToTile.ShowMoveTo();
+
+            _path = PathFinder.FindPath(_character.GetStandingTile(), moveToTile, tilesInRange);
+            StartCoroutine(MoveRoutine());
         }
 
         private IEnumerator MoveRoutine()
@@ -66,6 +75,7 @@ namespace Characters.CharacterControls.Movement
             }
 
             _movementEvents.CallStoppedEvent(_character.GetStandingTile(), _character);
+            _isMoving = false;
         }
 
         private List<OverlayTile> GetAvailableTilesInRange()

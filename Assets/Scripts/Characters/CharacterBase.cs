@@ -19,7 +19,7 @@ namespace Characters.CharacterControls
     #endregion
     public class CharacterBase : MonoBehaviour, ICharacter
     {
-        [SerializeField] protected CharacterStatsBase p_stats;
+        [SerializeField] protected CharacterStatsBase _stats;
 
         public CharacterHealthEvents HealthEvents { get; private set; }
         public CharacterMovementEvents MovementEvents { get; private set; }
@@ -47,8 +47,8 @@ namespace Characters.CharacterControls
 
         protected virtual void Start()
         {
-            _availableActionsCount = p_stats.ActionsPerTurnCount;
-            _health.Initialize(this, p_stats.Health, HealthEvents);
+            _availableActionsCount = _stats.ActionsPerTurnCount;
+            _health.Initialize(this, _stats.Health, HealthEvents);
             _movementController.Initialize(this, MovementEvents);
             _attackController.Initialize(this, AttackEvents);
         }
@@ -66,12 +66,12 @@ namespace Characters.CharacterControls
                     break;
 
                 case CombatActionType.Move:
-                    RangeFinder.ShowTilesInRange(_standingTile, p_stats.MovementStats.MoveDistance);
+                    RangeFinder.ShowTilesInRange(_standingTile, _stats.MovementStats.MoveDistance);
                     break;
 
                 case CombatActionType.Attack:
                     RangeFinder.HideTiles();
-                    RangeFinder.MarkEnemiesInRangeTiles(_standingTile, p_stats.AttackStats.AttackRange);
+                    RangeFinder.MarkEnemiesInRangeTiles(_standingTile, _stats.AttackStats.AttackRange);
                     break;
             }
         }
@@ -82,34 +82,19 @@ namespace Characters.CharacterControls
             {
                 case CombatActionType.Move:
                     _movementController.Move(actionTile);
-                    UseActionPoint();
+                    _availableActionsCount--;
                     break;
 
                 case CombatActionType.Attack:
                     _attackController.Attack(actionTile);
-                    UseActionPoint();
+                    _availableActionsCount--;
                     break;
 
                 case CombatActionType.None:
-                    ResetSelectedAction();
+                    _selectedAction = CombatActionType.None;
+                    _availableActionsCount = _stats.ActionsPerTurnCount;
                     break;
             }
-        }
-
-        public int GetAvailableActionPoints()
-        {
-            return _availableActionsCount;
-        }
-
-        protected void UseActionPoint()
-        {
-            _availableActionsCount--;
-        }
-
-        protected void ResetSelectedAction()
-        {
-            _selectedAction = CombatActionType.None;
-            _availableActionsCount = p_stats.ActionsPerTurnCount;
         }
 
         public int GetRemainingActionsCount()
@@ -119,9 +104,8 @@ namespace Characters.CharacterControls
 
         public int GetActionsPerTurnCount()
         {
-            return p_stats.ActionsPerTurnCount;
+            return _stats.ActionsPerTurnCount;
         }
-
         #endregion
 
         #region Getters Health Stuff
@@ -146,12 +130,12 @@ namespace Characters.CharacterControls
         #region Getters Attack Stuff
         public int GetAttackDamage()
         {
-            return p_stats.AttackStats.AttackDamage;
+            return _stats.AttackStats.AttackDamage;
         }
 
         public int GetAttackRange()
         {
-            return p_stats.AttackStats.AttackRange;
+            return _stats.AttackStats.AttackRange;
         }
 
         #endregion
@@ -159,12 +143,12 @@ namespace Characters.CharacterControls
         #region Getters Movement Stuff
         public float GetMoveSpeed()
         {
-            return p_stats.MovementStats.MoveSpeed;
+            return _stats.MovementStats.MoveSpeed;
         }
 
         public int GetMoveRange()
         {
-            return p_stats.MovementStats.MoveDistance;
+            return _stats.MovementStats.MoveDistance;
         }
         #endregion
 

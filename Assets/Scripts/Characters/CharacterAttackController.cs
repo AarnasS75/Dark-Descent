@@ -27,7 +27,7 @@ namespace Characters.CharacterControls.Attack
 
         public void Attack(OverlayTile selectedTile)
         {
-            if (selectedTile.IsAvailable && selectedTile.GetPosition2D() != _character.GetStandingTile().GetPosition2D() && _isAttacking)
+            if (!CanAttack(selectedTile))
             {
                 return;
             }
@@ -58,6 +58,18 @@ namespace Characters.CharacterControls.Attack
                 target.TakeDamage(_character.GetAttackDamage());
                 _attackEvents.CallAttackEvent(_targetTile, _character, target);
             }
+        }
+
+        private bool CanAttack(OverlayTile selectedTile)
+        {
+            if (selectedTile.IsAvailable || 
+                _isAttacking || 
+                _character.GetRemainingActionsCount() <= 0 || 
+                selectedTile.GetPosition2D() == _character.GetStandingTile().GetPosition2D())
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
