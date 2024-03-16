@@ -50,6 +50,7 @@ namespace Characters.CharacterControls.Movement
 
             IsMoving = true;
             HideTilesInRange();
+            _character.GetStandingTile().Hide();
             moveToTile.ShowMoveTo();
 
             _path = GetPath(moveToTile, tilesInRange);
