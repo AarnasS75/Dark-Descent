@@ -20,6 +20,11 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        FindPlayer();
+    }
+
+    private void Start()
+    {
         UpdateGameState(GameState.GameStarted);
     }
 
@@ -52,7 +57,6 @@ public class GameManager : MonoBehaviour
         switch (newGameState)
         {
             case GameState.GameStarted:
-                InitializePlayer();
                 InitializeManagers();
                 break;
 
@@ -70,7 +74,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void InitializePlayer()
+    private void FindPlayer()
     {
         _player = FindObjectOfType<Player>();
         if (_player == null)
@@ -90,6 +94,7 @@ public class GameManager : MonoBehaviour
         _canvasManager.Initialize(_player);
         _inputManager.Initialize(_player);
         _turnManager.Initialize(_player);
+        _player.Initialize(_roomsManager.GetMap());
 
         UpdateGameState(GameState.PlayingLevel);
     }

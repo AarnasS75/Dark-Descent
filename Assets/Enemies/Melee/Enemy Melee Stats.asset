@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Enemy Melee Stats
   m_EditorClassIdentifier: 
   _health: 100
-  _actionsPerTurnCount: 3
+  _actionsPerTurnCount: 2
   _movementStats:
     _moveSpeed: 3
     _moveDistance: 2
   _attackStats:
-    _attackDamage: 20
+    _attackDamage: 15
     _attackRange: 1

@@ -11,10 +11,11 @@ public interface ICharacter
     CharacterAttackEvents AttackEvents { get; }
 
     // Action
-    void SelectAction(CombatActionType actionType);
-    void TakeAction(OverlayTile actionTile);
+    void TakeAction(CombatActionType actionType, OverlayTile actionTile);
+    void UseActionPoint();
     int GetRemainingActionsCount();
     int GetActionsPerTurnCount();
+    CombatActionType GetSelectedAction();
 
     // Attack
     int GetAttackDamage();
@@ -30,5 +31,6 @@ public interface ICharacter
     void TakeDamage(int damageAmmount);
 
     // Position
+    public void Place(OverlayTile placeTile);
     public OverlayTile GetStandingTile();
 }

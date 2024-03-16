@@ -16,33 +16,44 @@ namespace Characters.CharacterControls.Movement
         private List<OverlayTile> _path;
 
         private CharacterMovementEvents _movementEvents;
-        private bool _isMoving;
+        public bool IsMoving { get; private set; }
+
+        private PathFinder _pathFinder;
 
         private void Awake()
         {
-            _isMoving = false;
+            IsMoving = false;
         }
 
-        public void Initialize(ICharacter character, CharacterMovementEvents movementEvents)
+        public void Initialize(ICharacter character, CharacterMovementEvents movementEvents, PathFinder pathFinder)
         {
             _character = character;
             _movementEvents = movementEvents;
+
+            _pathFinder = pathFinder;
         }
 
         public void Move(OverlayTile moveToTile)
         {
             var tilesInRange = GetAvailableTilesInRange();
 
-            if (_character.GetRemainingActionsCount() <= 0 || !tilesInRange.Contains(moveToTile) || _isMoving)
+            if (_character.GetRemainingActionsCount() <= 0 || !tilesInRange.Contains(moveToTile) || IsMoving)
+            {
+                print($"Cant go to: {moveToTile} | Action count: {_character.GetRemainingActionsCount()} | Tile in range: {tilesInRange.Contains(moveToTile)} | IsMoving: {IsMoving}");
+                return;
+            }
+
+            if (_character is IPlayer player && !PlayerStaminaTracker.Instance.UseStamina(10))
             {
                 return;
             }
 
-            _isMoving = true;
-            RangeFinder.HideTiles();
+            IsMoving = true;
+            HideTilesInRange();
             moveToTile.ShowMoveTo();
 
-            _path = PathFinder.FindPath(_character.GetStandingTile(), moveToTile, tilesInRange);
+            _path = GetPath(moveToTile, tilesInRange);
+
             StartCoroutine(MoveRoutine());
         }
 
@@ -65,22 +76,38 @@ namespace Characters.CharacterControls.Movement
                 _path.RemoveAt(0);
             }
 
-            if(_character.GetRemainingActionsCount() <= 0)
+            _character.UseActionPoint();
+            if (_character.GetRemainingActionsCount() <= 0)
             {
-                RangeFinder.HideTiles();
+                HideTilesInRange();
             }
             else
             {
-                RangeFinder.ShowTilesInRange(_character.GetStandingTile(), _character.GetMoveRange());
+                ShowTilesInRange();
             }
 
             _movementEvents.CallStoppedEvent(_character.GetStandingTile(), _character);
-            _isMoving = false;
+            IsMoving = false;
+        }
+
+        private List<OverlayTile> GetPath(OverlayTile moveToTile, List<OverlayTile> tilesInRange)
+        {
+            return _pathFinder.FindPath(_character.GetStandingTile(), moveToTile, tilesInRange);
         }
 
         private List<OverlayTile> GetAvailableTilesInRange()
         {
-            return RangeFinder.GetTilesInRange(_character.GetStandingTile(), _character.GetMoveRange()).Where(x => x.IsAvailable).ToList();
+            return _pathFinder.GetAvailableTilesWithinMoveRange(_character.GetStandingTile(), _character.GetMoveRange());
+        }
+
+        private void HideTilesInRange()
+        {
+            _pathFinder.HideAvailableTilesWithinMoveRange(_character.GetStandingTile(), _character.GetMoveRange());
+        }
+
+        private void ShowTilesInRange()
+        {
+            _pathFinder.ShowAvailableTilesWithinMoveRange(_character.GetStandingTile(), _character.GetMoveRange());
         }
     }
 }

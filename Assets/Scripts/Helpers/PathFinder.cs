@@ -5,40 +5,105 @@ using UnityEngine;
 
 namespace Helpers.PathFinding
 {
-    public static class PathFinder
+    public class PathFinder
     {
-        private static Dictionary<Vector2Int, OverlayTile> _map;
-        private static Dictionary<Vector2Int, OverlayTile> _searchableTiles;
+        private Dictionary<Vector2Int, OverlayTile> _map;
+        private Dictionary<Vector2Int, OverlayTile> _searchableTiles;
 
-        public static void UpdateWithNewMap(Dictionary<Vector2Int, OverlayTile> newMap)
+        public PathFinder(Dictionary<Vector2Int, OverlayTile> newMap)
         {
             _map = newMap;
         }
 
-        public static List<OverlayTile> FindPath(OverlayTile start, OverlayTile end, List<OverlayTile> inRangeTiles)
+        public void ShowAvailableTilesWithinMoveRange(OverlayTile centerTile, int moveRange)
+        {
+            var inRangeTiles = _map.Values
+                .Where(tile => tile.IsAvailable && GetManhattenDistance(centerTile, tile) <= moveRange)
+                .ToList();
+
+            foreach (var tile in inRangeTiles)
+            {
+                var path = FindPath(centerTile, tile, inRangeTiles);
+
+                if (path.Count > 0 && path.Count - 1 <= moveRange)
+                {
+                    tile.Show();
+                }
+            }
+        }
+
+        public List<OverlayTile> GetAvailableTilesWithinMoveRange(OverlayTile centerTile, int moveRange)
+        {
+            var availableTiles = new List<OverlayTile>();
+
+            // Find all tiles within the move range
+            var inRangeTiles = _map.Values
+                .Where(tile => tile.IsAvailable && GetManhattenDistance(centerTile, tile) <= moveRange)
+                .ToList();
+
+            // Iterate through each tile in range and find paths to it
+            foreach (var tile in inRangeTiles)
+            {
+                // Find a path from the centerTile to the current tile within the move range
+                var path = FindPath(centerTile, tile, inRangeTiles);
+
+                // If a valid path exists within the move range, add the tile to the list
+                if (path.Count > 0 && path.Count - 1 <= moveRange)
+                {
+                    availableTiles.Add(tile);
+                }
+            }
+
+            return availableTiles;
+        }
+
+        public void HideAvailableTilesWithinMoveRange(OverlayTile centerTile, int moveRange)
+        {
+            // Get available tiles within move range
+            var availableTiles = GetAvailableTilesWithinMoveRange(centerTile, moveRange);
+
+            // Hide each available tile
+            foreach (var tile in availableTiles)
+            {
+                tile.Hide();
+            }
+        }
+
+        public List<OverlayTile> FindPath(OverlayTile start, OverlayTile end, List<OverlayTile> inRangeTiles)
         {
             _searchableTiles = new Dictionary<Vector2Int, OverlayTile>();
 
-            List<OverlayTile> openList = new List<OverlayTile>();
-            HashSet<OverlayTile> closedList = new HashSet<OverlayTile>();
+            var openList = new List<OverlayTile>();
+            var closedList = new HashSet<OverlayTile>();
 
             if (inRangeTiles.Count > 0)
             {
                 foreach (var item in inRangeTiles)
                 {
-                    _searchableTiles.Add(item.GetPosition2D(), _map[item.GetPosition2D()]);
+                    if (item.IsAvailable) // Check if the tile is available
+                        _searchableTiles.Add(item.GetPosition2D(), _map[item.GetPosition2D()]);
                 }
             }
             else
             {
-                _searchableTiles = _map;
+                foreach (var tile in _map.Values)
+                {
+                    if (tile.IsAvailable)
+                        _searchableTiles.Add(tile.GetPosition2D(), tile);
+                }
+
+                if (!_searchableTiles.ContainsKey(start.GetPosition2D()))
+                    _searchableTiles.Add(start.GetPosition2D(), start);
+
+                if (!_searchableTiles.ContainsKey(end.GetPosition2D()))
+                    _searchableTiles.Add(end.GetPosition2D(), end);
             }
 
             openList.Add(start);
 
             while (openList.Count > 0)
             {
-                OverlayTile currentOverlayTile = openList.OrderBy(x => x.F).First();
+                var currentOverlayTile = openList.OrderBy(x => x.F).First();
 
                 openList.Remove(currentOverlayTile);
                 closedList.Add(currentOverlayTile);
@@ -71,10 +136,10 @@ namespace Helpers.PathFinding
             return new List<OverlayTile>();
         }
 
-        private static List<OverlayTile> GetFinishedList(OverlayTile start, OverlayTile end)
+        private List<OverlayTile> GetFinishedList(OverlayTile start, OverlayTile end)
         {
-            List<OverlayTile> finishedList = new List<OverlayTile>();
-            OverlayTile currentTile = end;
+            var finishedList = new List<OverlayTile>();
+            var currentTile = end;
 
             while (currentTile != start)
             {
@@ -87,12 +152,12 @@ namespace Helpers.PathFinding
             return finishedList;
         }
 
-        public static int GetManhattenDistance(OverlayTile start, OverlayTile tile)
+        public int GetManhattenDistance(OverlayTile start, OverlayTile tile)
         {
             return Mathf.Abs(start.GetGridLocation().x - tile.GetGridLocation().x) + Mathf.Abs(start.GetGridLocation().y - tile.GetGridLocation().y);
         }
 
-        private static List<OverlayTile> GetNeightbourOverlayTiles(OverlayTile currentOverlayTile)
+        private List<OverlayTile> GetNeightbourOverlayTiles(OverlayTile currentOverlayTile)
         {
             var neighbours = new List<OverlayTile>();
 
@@ -142,7 +207,5 @@ namespace Helpers.PathFinding
 
             return neighbours;
         }
-
-      
     }
 }

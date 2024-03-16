@@ -1,10 +1,12 @@
 using Characters.CharacterControls;
+using System.Collections.Generic;
+using Tiles;
 using UnityEngine;
 
 namespace Characters.EnemyControls
 {
     [RequireComponent(typeof(EnemyAIController))]
-    public class Enemy : CharacterBase, IEnemy
+    public class Enemy : CharacterBase<EnemyStats>, IEnemy
     {
         private EnemyAIController _aIController;
 
@@ -14,10 +16,10 @@ namespace Characters.EnemyControls
             _aIController = GetComponent<EnemyAIController>();
         }
 
-        protected override void Start()
+        public override void Initialize(Dictionary<Vector2Int, OverlayTile> roomMap)
         {
-            base.Start();
-            _aIController.Initialize(this);
+            base.Initialize(roomMap);
+            _aIController.Initialize(this, _pathFinder);
         }
 
         public bool CreateActionScenario(IPlayer player)

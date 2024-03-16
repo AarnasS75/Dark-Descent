@@ -1,4 +1,3 @@
-using Characters.CharacterControls;
 using Characters.CharacterControls.HealthEvents;
 using UnityEngine;
 
@@ -28,11 +27,8 @@ namespace Tiles
         public void PlaceCharacter(ICharacter characterToPlace)
         {
             characterToPlace.HealthEvents.OnDied += HealthEvents_OnDied;
-            var character = characterToPlace as CharacterBase;
-
-            character.transform.position = new Vector3(transform.position.x, transform.position.y + 0.0001f, transform.position.z);
-            _standingCharacter = character;
-            character.SetStandingTile(this);
+            _standingCharacter = characterToPlace;
+            characterToPlace.Place(this);
 
             if (Previous != null)
             {

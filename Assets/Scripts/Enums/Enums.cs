@@ -10,7 +10,7 @@ namespace Constants
 
     public enum CombatActionType
     {
-        None,
+        EndTurn,
         Move,
         Attack
     }

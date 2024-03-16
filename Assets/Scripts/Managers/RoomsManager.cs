@@ -28,10 +28,9 @@ namespace Managers.Rooms
         private Room _currentRoom;
         private IPlayer _player;
 
-        public event Action OnLoadRoom; 
-
         public void Initialize(IPlayer player)
         {
+            _roomMap = new();
             _player = player;
             _player.MovementEvents.OnCharacterStopped += MovementEvents_OnCharacterStopped;
         }
@@ -43,7 +42,6 @@ namespace Managers.Rooms
             if (arg2.StandingTile.GetPosition2D() == exitTilePosition.Value)
             {
                 print("Load next room");
-                DeleteCurrentRoom();
                 LoadRoom();
             }
         }
@@ -68,12 +66,12 @@ namespace Managers.Rooms
 
         public void LoadRoom()
         {
-            _roomMap = new();
-
+            DeleteCurrentRoom();
             _currentRoom = Instantiate(_roomsDb.GetRandom());
-            var groundMap = _currentRoom.GetRoomGroundMap();
 
+            var groundMap = _currentRoom.GetRoomGroundMap();
             var groundBounds = groundMap.cellBounds;
+            var index = 0;
 
             for (int z = groundBounds.max.z; z >= groundBounds.min.z; z--)
             {
@@ -86,6 +84,7 @@ namespace Managers.Rooms
                             if (!_roomMap.ContainsKey(new Vector2Int(x, y)))
                             {
                                 var overlayTile = Instantiate(_overlayTilePrefab, _overlayContainerObject.transform);
+                                overlayTile.name = $"Tile_{index++}";
                                 var cellWorldPosition = groundMap.GetCellCenterWorld(new Vector3Int(x, y, z));
 
                                 overlayTile.transform.position = new Vector3(cellWorldPosition.x, cellWorldPosition.y, cellWorldPosition.z + 1);
@@ -98,19 +97,18 @@ namespace Managers.Rooms
                 }
             }
 
-            PathFinder.UpdateWithNewMap(_roomMap);
-            RangeFinder.UpdateWithNewMap(_roomMap); 
-            RangeFinder.HideTiles();
-
             InitializeRoom();
         }
 
         private void DeleteCurrentRoom()
         {
-            RangeFinder.HideTiles();
-            Destroy(_currentRoom.gameObject);
-
-            OnLoadRoom?.Invoke();
+            if (_currentRoom != null)
+            {
+               // RangeFinder.HideTiles();
+                _roomMap.Clear();
+                _player.RefreshActions();
+                Destroy(_currentRoom.gameObject);
+            }
         }
 
         private void InitializeRoom()
@@ -118,7 +116,7 @@ namespace Managers.Rooms
             var enemiesToSpawn = new List<Enemy>();
             var enemiesToSpawnCount = _currentRoom.GetEnemiesToSpawnCount();
 
-            while(enemiesToSpawnCount > 0)
+            while (enemiesToSpawnCount > 0)
             {
                 enemiesToSpawn.Add(_enemiesDb.GetRandom());
                 enemiesToSpawnCount--;

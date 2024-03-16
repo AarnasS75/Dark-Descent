@@ -3,20 +3,20 @@ using Tiles;
 
 public class ActionScenario
 {
-    public float ScenarioValue;
+    public float Value;
     public OverlayTile MoveToTile;
     public OverlayTile AttackTile;
 
     public ActionScenario(float scenarioValue, OverlayTile attackTile, OverlayTile moveToTile)
     {
-        ScenarioValue = scenarioValue;
+        Value = scenarioValue;
         MoveToTile = moveToTile;
         AttackTile = attackTile;
     }
 
     public ActionScenario()
     {
-        ScenarioValue = -100000;
+        Value = -100000;
         MoveToTile = null;
         AttackTile = null;
     }

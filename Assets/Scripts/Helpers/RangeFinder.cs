@@ -6,87 +6,82 @@ using UnityEngine;
 
 namespace Helpers.RangeFinding
 {
-    public static class RangeFinder
+    public class RangeFinder
     {
-        private static Dictionary<Vector2Int, OverlayTile> _map;
+        private Dictionary<Vector2Int, OverlayTile> _map;
 
-        public static void UpdateWithNewMap(Dictionary<Vector2Int, OverlayTile> map)
+        public RangeFinder(Dictionary<Vector2Int, OverlayTile> map)
         {
             _map = map;
         }
 
-        public static List<OverlayTile> GetTilesInRange(OverlayTile standingTile, int range)
+        public List<OverlayTile> GetTilesInRange(OverlayTile standingTile, int range)
         {
-            var inRangeTiles = new List<OverlayTile>();
+            var inRangeTiles = new HashSet<OverlayTile>();
+            var tilesForPreviousStep = new HashSet<OverlayTile>();
             int stepCount = 0;
 
             inRangeTiles.Add(standingTile);
-
-            //Should contain the surroundingTiles of the previous step. 
-            var tilesForPreviousStep = new List<OverlayTile>();
             tilesForPreviousStep.Add(standingTile);
+
             while (stepCount < range)
             {
-                var surroundingTiles = new List<OverlayTile>();
+                var surroundingTiles = new HashSet<OverlayTile>();
 
                 foreach (var item in tilesForPreviousStep)
                 {
-                    surroundingTiles.AddRange(GetSurroundingTiles(item.GetPosition2D()));
+                    surroundingTiles.UnionWith(GetSurroundingTiles(item.GetPosition2D()));
                 }
 
-                inRangeTiles.AddRange(surroundingTiles);
-                tilesForPreviousStep = surroundingTiles.Distinct().ToList();
+                inRangeTiles.UnionWith(surroundingTiles);
+                tilesForPreviousStep = new HashSet<OverlayTile>(surroundingTiles);
                 stepCount++;
             }
 
-            return inRangeTiles.Distinct().ToList();
+            return inRangeTiles.ToList();
         }
 
-        private static List<OverlayTile> GetSurroundingTiles(Vector2Int originTile)
+        private List<OverlayTile> GetSurroundingTiles(Vector2Int originTile)
         {
             var surroundingTiles = new List<OverlayTile>();
 
-            Vector2Int TileToCheck = new Vector2Int(originTile.x + 1, originTile.y);
-            if (_map.ContainsKey(TileToCheck))
+            if (_map.TryGetValue(originTile, out OverlayTile originOverlayTile))
             {
-                if (Mathf.Abs(_map[TileToCheck].transform.position.z - _map[originTile].transform.position.z) <= 1)
-                    surroundingTiles.Add(_map[TileToCheck]);
-            }
+                float originZ = originOverlayTile.transform.position.z;
 
-            TileToCheck = new Vector2Int(originTile.x - 1, originTile.y);
-            if (_map.ContainsKey(TileToCheck))
-            {
-                if (Mathf.Abs(_map[TileToCheck].transform.position.z - _map[originTile].transform.position.z) <= 1)
-                    surroundingTiles.Add(_map[TileToCheck]);
-            }
-
-            TileToCheck = new Vector2Int(originTile.x, originTile.y + 1);
-            if (_map.ContainsKey(TileToCheck))
-            {
-                if (Mathf.Abs(_map[TileToCheck].transform.position.z - _map[originTile].transform.position.z) <= 1)
-                    surroundingTiles.Add(_map[TileToCheck]);
-            }
-
-            TileToCheck = new Vector2Int(originTile.x, originTile.y - 1);
-            if (_map.ContainsKey(TileToCheck))
-            {
-                if (Mathf.Abs(_map[TileToCheck].transform.position.z - _map[originTile].transform.position.z) <= 1)
-                    surroundingTiles.Add(_map[TileToCheck]);
+                AddIfInRange(originTile.x + 1, originTile.y, originZ, surroundingTiles);
+                AddIfInRange(originTile.x - 1, originTile.y, originZ, surroundingTiles);
+                AddIfInRange(originTile.x, originTile.y + 1, originZ, surroundingTiles);
+                AddIfInRange(originTile.x, originTile.y - 1, originZ, surroundingTiles);
             }
 
             return surroundingTiles;
         }
 
-        public static void ShowTilesInRange(OverlayTile standingTile, int range)
+        private void AddIfInRange(int x, int y, float originZ, List<OverlayTile> surroundingTiles)
         {
-            var rangeFinderTiles = GetTilesInRange(standingTile, range);
+            var TileToCheck = new Vector2Int(x, y);
+            if (_map.TryGetValue(TileToCheck, out OverlayTile tile))
+            {
+                if (Mathf.Abs(tile.transform.position.z - originZ) <= 1)
+                {
+                    surroundingTiles.Add(tile);
+                }
+            }
+        }
+
+
+        public void ShowTilesInRange(OverlayTile standingTile, int range)
+        {
+            HideTiles();
+            var rangeFinderTiles = GetTilesInRange(standingTile, range).Where(x => x.IsAvailable);
             foreach (var item in rangeFinderTiles)
             {
                 item.Show();
             }
         }
 
-        public static void HideTiles()
+        public void HideTiles()
         {
             foreach (var item in _map)
             {
@@ -94,8 +89,9 @@ namespace Helpers.RangeFinding
             }
         }
 
-        public static void MarkEnemiesInRangeTiles(OverlayTile standingTile, int attackRange)
+        public void ShowTilesInAttackRange(OverlayTile standingTile, int attackRange)
         {
+            HideTiles();
             var rangeFinderTiles = GetTilesInRange(standingTile, attackRange).Where(x => !x.IsAvailable && x.GetPosition2D() != standingTile.GetPosition2D());
 
             foreach (var item in rangeFinderTiles)

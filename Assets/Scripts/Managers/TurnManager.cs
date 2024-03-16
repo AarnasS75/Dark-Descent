@@ -1,6 +1,7 @@
 using Characters.CharacterControls.AttackEvents;
 using Characters.CharacterControls.HealthEvents;
 using Characters.CharacterControls.MovementEvents;
+using Characters.CharacterControls.Player;
 using Constants;
 using System;
 using System.Collections;
@@ -38,7 +39,7 @@ public class TurnManager : MonoBehaviour
         UpdateTurnState(TurnState.PlayerTurn);
     }
 
-    public void EndTurn()
+    public void EndPlayerTurn()
     {
         UpdateTurnState(TurnState.EnemyTurn);
     }
@@ -48,6 +49,7 @@ public class TurnManager : MonoBehaviour
         switch (turnState)
         {
             case TurnState.PlayerTurn:
+                _player.RefreshActions();
                 OnCharacterTurn?.Invoke(_player);
                 break;
 
@@ -55,6 +57,7 @@ public class TurnManager : MonoBehaviour
 
                 if (_enemies.Count > 0 && _enemies[_currentEnemyIndex].CreateActionScenario(_player))
                 {
+                    print(_enemies[_currentEnemyIndex]);
                     OnCharacterTurn?.Invoke(_enemies[_currentEnemyIndex]);
                 }
                 else
@@ -70,14 +73,21 @@ public class TurnManager : MonoBehaviour
         }
     }
 
+    // This is a bit sussy, maybe make a generic action for Move and Attack actions
     private void Character_OnStopped(CharacterMovementEvents events, CharacterStoppedEventArgs characterStoppedEventArgs)
     {
         if(characterStoppedEventArgs.Character is IEnemy enemy)
         {
             StartCoroutine(GetNextEnemyTurn(enemy));
         }
+
+        if (_enemies.Count == 0)
+        {
+            UpdateTurnState(TurnState.PlayerTurn);
+        }
     }
 
+    // This is a bit sussy, maybe make a generic action for Move and Attack actions
     private void Character_OnAttacked(CharacterAttackEvents events, CharacterAttackedEventArgs args)
     {
         if (args.Attacker is IEnemy enemy)
@@ -91,6 +101,11 @@ public class TurnManager : MonoBehaviour
         if(args.Character is IEnemy enemy)
         {
             _enemies.Remove(enemy);
+        }
+
+        if (_enemies.Count == 0)
+        {
+            UpdateTurnState(TurnState.PlayerTurn);
         }
     }
 

@@ -23,13 +23,13 @@ public class RoomController : MonoBehaviour
        // _exitMap.color = new Color(1f, 1f, 1f, 0f);
     }
 
-    private void OnDestroy()
+    /*private void OnDestroy()
     {
         foreach (var enemy in FindObjectsOfType<Enemy>())
         {
             Destroy(enemy.gameObject);
         }
-    }
+    }*/
 
     public void Initialize(IPlayer player, Dictionary<Vector2Int, OverlayTile> roomMap, List<Enemy> enemies)
     {
@@ -64,7 +64,7 @@ public class RoomController : MonoBehaviour
             }
         }
 
-        Debug.LogWarning("The Exit tile is not found on the exit map.");
+        Debug.LogError("The Exit tile is not found on the exit map.");
         return null;
     }
 
@@ -79,7 +79,7 @@ public class RoomController : MonoBehaviour
             }
         }
 
-        Debug.LogWarning("The Entrance tile is not found on the entrance map.");
+        Debug.LogError("The Entrance tile is not found on the entrance map.");
         return null;
     }
 
@@ -97,7 +97,8 @@ public class RoomController : MonoBehaviour
 
                 if (availablePosition != null && roomMap.TryGetValue(availablePosition, out var tile))
                 {
-                    var enemyToSpawn = Instantiate(enemy);
+                    var enemyToSpawn = Instantiate(enemy, transform);
+                    enemyToSpawn.Initialize(roomMap);
                     tile.PlaceCharacter(enemyToSpawn);
 
                     _spawnedEnemies.Add(enemyToSpawn);

@@ -16,17 +16,17 @@ public class PlayerActionsControllerUI : MonoBehaviour
 
         _moveActionBtn.onClick.AddListener(() =>
         {
-            _player.SelectAction(CombatActionType.Move);
+            _player.TakeAction(CombatActionType.Move, null);
         });
 
         _attackActionBtn.onClick.AddListener(() =>
         {
-            _player.SelectAction(CombatActionType.Attack);
+            _player.TakeAction(CombatActionType.Attack, null);
         });
 
         _endTurnActionBtn.onClick.AddListener(() =>
         {
-            _player.SelectAction(CombatActionType.None);
+            _player.TakeAction(CombatActionType.EndTurn, null);
         });
     }
 }

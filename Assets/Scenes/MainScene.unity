@@ -644,6 +644,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 364241410}
   m_CullTransparentMesh: 1
+--- !u!1 &368618300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 368618301}
+  m_Layer: 0
+  m_Name: --- MISC ----
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &368618301
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368618300}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &372310896
 GameObject:
   m_ObjectHideFlags: 0
@@ -1319,7 +1350,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 351451965}
         m_TargetAssemblyTypeName: TurnManager, Assembly-CSharp
-        m_MethodName: EndTurn
+        m_MethodName: EndPlayerTurn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1567,6 +1598,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faefccc3daec7b84ead14d0c19f37b91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _clickBuffer: 0.25
   _cursorPrefab: {fileID: 8293269530522072877, guid: b9b7b65cb2b62164bbfcf88cb7a68a95, type: 3}
 --- !u!1 &1114573051
 GameObject:
@@ -2603,6 +2635,54 @@ MonoBehaviour:
   _startingTab: {fileID: 1194637303}
   _tabs:
   - {fileID: 1194637303}
+--- !u!1 &1756780039
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1756780040}
+  - component: {fileID: 1756780041}
+  m_Layer: 0
+  m_Name: Stamina Backround Worker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1756780040
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756780039}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1756780041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756780039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 458e870ed21e74e409dea4786009d363, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxStamina: 50
+  _staminaRecoveryRate: 0.1
+  _staminaRecoveryAmmount: 10
+  _currentStamina: 0
 --- !u!1 &1810466547
 GameObject:
   m_ObjectHideFlags: 0
@@ -3260,3 +3340,5 @@ SceneRoots:
   - {fileID: 372310897}
   - {fileID: 1735053680}
   - {fileID: 742223938}
+  - {fileID: 368618301}
+  - {fileID: 1756780040}
