@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Rooms DB
   m_EditorClassIdentifier: 
   _rooms:
-  - {fileID: 3203888909425781020, guid: 33ad68d6c21efe343a7d6eaa50339ead, type: 3}
+  - {fileID: 3203888909425781020, guid: fe80fddce9127314e93732651defacd5, type: 3}

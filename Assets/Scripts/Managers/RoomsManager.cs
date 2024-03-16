@@ -1,8 +1,5 @@
 using Characters.CharacterControls.MovementEvents;
-using Characters.CharacterControls.Player;
 using Characters.EnemyControls;
-using Helpers.PathFinding;
-using Helpers.RangeFinding;
 using Rooms;
 using System;
 using System.Collections.Generic;
@@ -28,6 +25,8 @@ namespace Managers.Rooms
         private Room _currentRoom;
         private IPlayer _player;
 
+        public event Action<Room> OnRoomExit;
+
         public void Initialize(IPlayer player)
         {
             _roomMap = new();
@@ -35,28 +34,9 @@ namespace Managers.Rooms
             _player.MovementEvents.OnCharacterStopped += MovementEvents_OnCharacterStopped;
         }
 
-        private void MovementEvents_OnCharacterStopped(CharacterMovementEvents arg1, CharacterStoppedEventArgs arg2)
-        {
-            var exitTilePosition = _currentRoom.GetExitPosition();
-
-            if (arg2.StandingTile.GetPosition2D() == exitTilePosition.Value)
-            {
-                print("Load next room");
-                LoadRoom();
-            }
-        }
-
         public Dictionary<Vector2Int, OverlayTile> GetMap()
         {
             return _roomMap;
-        }
-
-        public void HideOverviewTiles()
-        {
-            foreach (var item in _roomMap)
-            {
-                item.Value.Hide();
-            }
         }
 
         public List<IEnemy> GetSpawnedEnemies()
@@ -100,11 +80,22 @@ namespace Managers.Rooms
             InitializeRoom();
         }
 
+        private void MovementEvents_OnCharacterStopped(CharacterMovementEvents arg1, CharacterStoppedEventArgs arg2)
+        {
+            var exitTilePosition = _currentRoom.GetExitPosition();
+
+            if (arg2.StandingTile.GetPosition2D() == exitTilePosition.Value)
+            {
+                print("Load next room");
+                OnRoomExit?.Invoke(_currentRoom);
+            }
+        }
+
         private void DeleteCurrentRoom()
         {
             if (_currentRoom != null)
             {
-               // RangeFinder.HideTiles();
+                HideAnyShownTiles();
                 _roomMap.Clear();
                 _player.RefreshActions();
                 Destroy(_currentRoom.gameObject);
@@ -123,6 +114,14 @@ namespace Managers.Rooms
             }
 
             _currentRoom.Initialize(_player, _roomMap, enemiesToSpawn);
+        }
+
+        private void HideAnyShownTiles()
+        {
+            foreach (var tile in _roomMap.Values)
+            {
+                tile.Hide();
+            }
         }
     }
 }

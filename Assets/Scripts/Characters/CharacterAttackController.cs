@@ -1,8 +1,6 @@
 using Characters.CharacterControls.AttackEvents;
-using Helpers.PathFinding;
 using Helpers.RangeFinding;
 using System.Collections;
-using System.Collections.Generic;
 using Tiles;
 using UnityEngine;
 
@@ -43,8 +41,11 @@ namespace Characters.CharacterControls.Attack
                 return;
             }
 
-            IsAttacking = true;
             _targetTile = selectedTile;
+            IsAttacking = true;
+            _rangeFinder.HideTiles();
+            _targetTile.Mark();
+
             StartAttackRoutine();
         }
 
@@ -55,9 +56,6 @@ namespace Characters.CharacterControls.Attack
 
         private IEnumerator AttackRoutine()
         {
-            _rangeFinder.HideTiles();
-            _targetTile.Mark();
-
             yield return new WaitForSeconds(0.5f);
 
             IsAttacking = false;

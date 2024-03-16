@@ -346,7 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e395fca8753f8a46a5e76a0ffa0da88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemiesToSpawnCount: 2
+  _enemiesToSpawnCount: 1
   _groundMap: {fileID: 7894690452449154846}
   _entranceMap: {fileID: 8690181085509808029}
   _exitMap: {fileID: 524771790200811878}

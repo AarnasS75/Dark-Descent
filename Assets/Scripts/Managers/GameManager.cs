@@ -3,6 +3,7 @@ using Characters.CharacterControls.Player;
 using Constants;
 using Managers.InpuHandling;
 using Managers.Rooms;
+using Rooms;
 using System;
 using UnityEngine;
 
@@ -32,12 +33,14 @@ public class GameManager : MonoBehaviour
     {
         _turnManager.OnCharacterTurn += _turnSystem_OnCharacterTurn;
         _player.HealthEvents.OnDied += PlayerHealthEvents_OnDied;
+        _roomsManager.OnRoomExit += _roomsManager_OnRoomExit;
     }
 
     private void OnDisable()
     {
         _turnManager.OnCharacterTurn -= _turnSystem_OnCharacterTurn;
         _player.HealthEvents.OnDied -= PlayerHealthEvents_OnDied;
+        _roomsManager.OnRoomExit -= _roomsManager_OnRoomExit;
     }
 
     private void _turnSystem_OnCharacterTurn(ICharacter character)
@@ -86,6 +89,11 @@ public class GameManager : MonoBehaviour
     private void PlayerHealthEvents_OnDied(CharacterHealthEvents arg1, CharacterDiedEventArgs arg2)
     {
         UpdateGameState(GameState.GameEnded);
+    }
+
+    private void _roomsManager_OnRoomExit(Room exitedRoom)
+    {
+        UpdateGameState(GameState.PlayingLevel);
     }
 
     private void InitializeManagers()

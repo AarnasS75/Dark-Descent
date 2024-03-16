@@ -7,7 +7,7 @@ namespace Characters.HealthControls
     public class Health : MonoBehaviour
     {
         private int _maxHealth;
-        private int _currentHealth;
+        public int _currentHealth;
 
         private CharacterHealthEvents _healthEvents;
         private ICharacter _character;
@@ -15,8 +15,8 @@ namespace Characters.HealthControls
         public void Initialize(ICharacter character, int health, CharacterHealthEvents healthEvents)
         {
             _character = character;
-            _maxHealth = PlayerPrefs.GetInt(Settings.PLAYER_MAX_HEALTH, health);
-            _currentHealth = PlayerPrefs.GetInt(Settings.PLAYER_HEALTH, health);
+            _maxHealth = character is IPlayer ? PlayerPrefs.GetInt(Settings.PLAYER_MAX_HEALTH, health) : health;
+            _currentHealth = character is IPlayer ? PlayerPrefs.GetInt(Settings.PLAYER_HEALTH, health) : health;
             _healthEvents = healthEvents;
         }
 
