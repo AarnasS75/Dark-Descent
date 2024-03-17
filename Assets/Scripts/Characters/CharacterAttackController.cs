@@ -65,7 +65,7 @@ namespace Characters.CharacterControls.Attack
             if (target != null)
             {
                 _character.UseActionPoint();
-                target.TakeDamage(_character.GetAttackDamage());
+                target.TakeDamage(_character.GetWeapon().GetAttackDamage());
                 _attackEvents.CallAttackEvent(_targetTile, _character, target);
             }
         }

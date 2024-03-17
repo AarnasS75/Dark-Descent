@@ -17,9 +17,4 @@ MonoBehaviour:
   _movementStats:
     _moveSpeed: 2.5
     _moveDistance: 3
-  _attackStats:
-    _attackDamage: 50
-    _attackRange: 3
-  _stamina: 50
-  _staminaRecoveryRate: 0.1
-  _staminaRecoveryAmmount: 5
+  _weapon: {fileID: 11400000, guid: e414df01b30950f4ea23979b0e6966b0, type: 2}

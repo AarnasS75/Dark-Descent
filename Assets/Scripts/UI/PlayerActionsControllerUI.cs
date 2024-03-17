@@ -6,6 +6,9 @@ public class PlayerActionsControllerUI : MonoBehaviour
 {
     [SerializeField] private Button _moveActionBtn;
     [SerializeField] private Button _attackActionBtn;
+    [SerializeField] private Button _useItemActionBtn;
+    
+    [Space]
     [SerializeField] private Button _endTurnActionBtn;
 
     private IPlayer _player;
@@ -22,6 +25,11 @@ public class PlayerActionsControllerUI : MonoBehaviour
         _attackActionBtn.onClick.AddListener(() =>
         {
             _player.TakeAction(CombatActionType.Attack, null);
+        });
+
+        _useItemActionBtn.onClick.AddListener(() =>
+        {
+           // _player.TakeAction(CombatActionType.Attack, null);
         });
 
         _endTurnActionBtn.onClick.AddListener(() =>

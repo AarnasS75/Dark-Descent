@@ -1,11 +1,9 @@
 using Constants;
 using Helpers.PathFinding;
-using Helpers.RangeFinding;
 using System.Collections.Generic;
 using System.Linq;
 using Tiles;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 namespace Characters.EnemyControls
 {
@@ -15,7 +13,6 @@ namespace Characters.EnemyControls
         private IPlayer _player;
 
         private PathFinder _pathFinder;
-        private ActionScenario _previousScenario;
 
         public void Initialize(IEnemy enemy, PathFinder pathFinder)
         {
@@ -45,11 +42,11 @@ namespace Characters.EnemyControls
                 // Find the tile to go to, to be in range for attack
                 var closestDistance = _pathFinder.GetManhattenDistance(tempTile, _player.GetStandingTile());
 
-                if (_enemy.GetAttackRange() >= closestDistance)
+                if (_enemy.GetWeapon().GetAttackRange() >= closestDistance)
                 {
-                    var scenarioValue = _enemy.GetAttackDamage() + closestDistance - _player.GetHealth();
+                    var scenarioValue = _enemy.GetWeapon().GetAttackDamage() + closestDistance - _player.GetHealth();
 
-                    if(_player.GetHealth() - _enemy.GetAttackDamage() <= 0)
+                    if(_player.GetHealth() - _enemy.GetWeapon().GetAttackDamage() <= 0)
                     {
                         scenarioValue = 10000;
                     }
@@ -90,7 +87,7 @@ namespace Characters.EnemyControls
                 {
                     var senarioFullPath = _pathFinder.FindPath(_enemy.GetStandingTile(), _player.GetStandingTile(), new List<OverlayTile>());
 
-                    if (senarioFullPath.Count > _enemy.GetAttackRange() + _enemy.GetMoveRange())
+                    if (senarioFullPath.Count > _enemy.GetWeapon().GetAttackRange() + _enemy.GetMoveRange())
                     {
                         var senarioPath = senarioFullPath.GetRange(0, _enemy.GetMoveRange());
                         var senarioValue = senarioPath.Count - _player.GetHealth();

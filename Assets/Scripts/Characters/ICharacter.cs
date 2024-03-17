@@ -17,9 +17,8 @@ public interface ICharacter
     int GetActionsPerTurnCount();
     CombatActionType GetSelectedAction();
 
-    // Attack
-    int GetAttackDamage();
-    int GetAttackRange();
+    // Weapon
+    Weapon GetWeapon();
 
     // Movement
     float GetMoveSpeed();

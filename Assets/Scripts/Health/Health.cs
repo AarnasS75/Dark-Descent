@@ -6,8 +6,10 @@ namespace Characters.HealthControls
 {
     public class Health : MonoBehaviour
     {
+        [SerializeField] private Transform _healthbar;
+
         private int _maxHealth;
-        public int _currentHealth;
+        private int _currentHealth;
 
         private CharacterHealthEvents _healthEvents;
         private ICharacter _character;
@@ -28,6 +30,7 @@ namespace Characters.HealthControls
                 PlayerPrefs.SetInt(Settings.PLAYER_HEALTH, _currentHealth);
             }
 
+            UpdateHealthbar((float)_currentHealth / (float)_maxHealth);
             _healthEvents.CallHealthChangedEvent(_character, (float)_currentHealth / (float)_maxHealth, damage);
 
             if(_currentHealth <= 0)
@@ -45,6 +48,28 @@ namespace Characters.HealthControls
         public int GetMaxHealth()
         {
             return _maxHealth;
+        }
+
+        private void UpdateHealthbar(float percentage)
+        {
+            if (_healthbar == null)
+            {
+                return;
+            }
+
+            _healthbar.localScale = new Vector3(percentage, 1, 1);
+            if(percentage <= 0.5f)
+            {
+                _healthbar.GetComponentInChildren<SpriteRenderer>().color = Color.yellow;
+            }
+            else if (percentage <= 0.1f)
+            {
+                _healthbar.GetComponentInChildren<SpriteRenderer>().color = Color.red;
+            }
+            else
+            {
+                _healthbar.GetComponentInChildren<SpriteRenderer>().color = Color.green;
+            }
         }
     }
 }

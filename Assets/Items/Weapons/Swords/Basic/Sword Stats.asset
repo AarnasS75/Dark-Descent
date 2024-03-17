@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51a671aa023e78248b0de18fdee8af1c, type: 3}
+  m_Name: Sword Stats
+  m_EditorClassIdentifier: 
+  _name: Basic Sword
+  _sprite: {fileID: 21300000, guid: 8fb425aaf82d5604c822fdf75d5c3969, type: 3}
+  _damage: 22
+  _range: 2

@@ -13,8 +13,8 @@ namespace Managers.Rooms
         [Header("ROOMS DATABASE")]
         [SerializeField] private RoomsDatabase _roomsDb;
 
-        [Header("ENEMIES DATABASE")]
-        [SerializeField] private EnemyDatabase _enemiesDb;
+        [Header("ENEMY SPAWNER")]
+        [SerializeField] private EnemySpawner _enemySpawner;
 
         [Header("MISC")]
         [SerializeField] private OverlayTile _overlayTilePrefab;
@@ -32,6 +32,8 @@ namespace Managers.Rooms
             _roomMap = new();
             _player = player;
             _player.MovementEvents.OnCharacterStopped += MovementEvents_OnCharacterStopped;
+
+            _enemySpawner.Initialize(player);
         }
 
         public Dictionary<Vector2Int, OverlayTile> GetMap()
@@ -109,7 +111,7 @@ namespace Managers.Rooms
 
             while (enemiesToSpawnCount > 0)
             {
-                enemiesToSpawn.Add(_enemiesDb.GetRandom());
+                enemiesToSpawn.Add(_enemySpawner.SpawnRandom(_roomMap));
                 enemiesToSpawnCount--;
             }
 

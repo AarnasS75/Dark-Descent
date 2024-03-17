@@ -10,16 +10,6 @@ public class CharacterMovementStats
     public int MoveDistance => _moveDistance;
 }
 
-[System.Serializable]
-public class CharacterAttackStats
-{
-    [SerializeField][Min(0)] private int _attackDamage = 3;
-    [SerializeField][Min(0)] private int _attackRange = 3;
-
-    public int AttackDamage => _attackDamage;
-    public int AttackRange => _attackRange;
-}
-
 public abstract class CharacterStatsBase : ScriptableObject
 {
     [Header("BASE STATS")]
@@ -29,11 +19,10 @@ public abstract class CharacterStatsBase : ScriptableObject
     [Header("MOVEMENT STATS")]
     [SerializeField] private CharacterMovementStats _movementStats;
 
-    [Header("ATTACK STATS")]
-    [SerializeField] private CharacterAttackStats _attackStats;
+    [Header("STARTING WEAPON")]
+    [SerializeField] private SwordStats _weapon;
 
     public int Health => _health;
     public int ActionsPerTurnCount => _actionsPerTurnCount;
-    public CharacterAttackStats AttackStats => _attackStats;
     public CharacterMovementStats MovementStats => _movementStats;
 }

@@ -97,11 +97,10 @@ public class RoomController : MonoBehaviour
 
                 if (availablePosition != null && roomMap.TryGetValue(availablePosition, out var tile))
                 {
-                    var enemyToSpawn = Instantiate(enemy, transform);
-                    enemyToSpawn.Initialize(roomMap);
-                    tile.PlaceCharacter(enemyToSpawn);
+                    tile.PlaceCharacter(enemy);
 
-                    _spawnedEnemies.Add(enemyToSpawn);
+                    availablePositions.Remove(availablePosition);
+                    _spawnedEnemies.Add(enemy);
                     break;
                 }
                 attempts++;

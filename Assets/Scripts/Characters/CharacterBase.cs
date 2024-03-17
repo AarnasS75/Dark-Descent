@@ -22,6 +22,8 @@ namespace Characters.CharacterControls
     public class CharacterBase<T> : MonoBehaviour, ICharacter where T : CharacterStatsBase
     {
         [SerializeField] protected T _stats;
+        [SerializeField] private Weapon _weapon;
+        [SerializeField] private Transform _hand;
 
         public CharacterHealthEvents HealthEvents { get; private set; }
         public CharacterMovementEvents MovementEvents { get; private set; }
@@ -32,12 +34,12 @@ namespace Characters.CharacterControls
         private CharacterAttackController _attackController;
 
         private OverlayTile _standingTile;
-        public CombatActionType _selectedAction;
+        private CombatActionType _selectedAction;
+
+        private int _availableActionsCount;
 
         protected RangeFinder _rangeFinder;
         protected PathFinder _pathFinder;
-
-        public int _availableActionsCount;
 
         protected virtual void Awake()
         {
@@ -48,6 +50,8 @@ namespace Characters.CharacterControls
             HealthEvents = new CharacterHealthEvents();
             AttackEvents = new CharacterAttackEvents();
             MovementEvents = new CharacterMovementEvents();
+
+            _weapon = Instantiate(_weapon, _hand.position, Quaternion.identity, _hand);
         }
 
         public virtual void Initialize(Dictionary<Vector2Int, OverlayTile> roomMap)
@@ -60,6 +64,7 @@ namespace Characters.CharacterControls
             _health.Initialize(this, _stats.Health, HealthEvents);
             _movementController.Initialize(this, MovementEvents, _pathFinder);
             _attackController.Initialize(this, AttackEvents, _rangeFinder);
+            _weapon.Initialize(this);
         }
 
         public void TakeAction(CombatActionType selectedAction, OverlayTile actionTile = null)
@@ -91,7 +96,7 @@ namespace Characters.CharacterControls
                     }
                     else
                     {
-                        _rangeFinder.ShowTilesInAttackRange(_standingTile, _stats.AttackStats.AttackRange);
+                        _rangeFinder.ShowTilesInAttackRange(_standingTile, _weapon.GetAttackRange());
                     }
                     break;
 
@@ -150,14 +155,9 @@ namespace Characters.CharacterControls
         #endregion
 
         #region Getters Attack Stuff
-        public int GetAttackDamage()
+        public Weapon GetWeapon()
         {
-            return _stats.AttackStats.AttackDamage;
-        }
-
-        public int GetAttackRange()
-        {
-            return _stats.AttackStats.AttackRange;
+            return _weapon;
         }
 
         #endregion

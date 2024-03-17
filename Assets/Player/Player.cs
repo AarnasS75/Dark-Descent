@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Characters.CharacterControls.Player
 {
     public class Player : CharacterBase<PlayerStats>, IPlayer
